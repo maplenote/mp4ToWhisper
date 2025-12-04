@@ -8,6 +8,7 @@
 **必備工具**：FFmpeg, OpenAI Whisper (Python 版)
 **檔案結構**：
 
+- `powershell/`: 各步驟執行的 ps1 檔
 - `file/ori_mp4/`: 原始影片檔
 - `file/ori_mp3/`: 轉換後的 MP3 (或手動放入的 MP3)
 - `file/tmp_mp3/`: 切割後的 MP3 片段
@@ -76,7 +77,25 @@ Write-Host "準備完成！請確認 file/ori_mp3/ 內有檔案。" -ForegroundC
 切割後的檔案會存入 `file/tmp_mp3/`，命名格式為 `{ID}_chunk_{編號}.mp3`。
 Offset 資訊會存入 `file/tmp_csv/{ID}.csv`。
 
-請將以下腳本存為 `1_Split_Audio.ps1` 並執行。
+**參數說明**：
+
+- `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案
+- `-Force`：強制重新處理（忽略已存在的輸出檔案）
+
+**範例**：
+
+```powershell
+# 處理全部檔案
+.\powershell\1_Split_Audio.ps1
+
+# 處理指定檔案
+.\powershell\1_Split_Audio.ps1 -TargetFileName "my_video.mp3"
+
+# 強制重新處理指定檔案
+.\powershell\1_Split_Audio.ps1 -TargetFileName "my_video.mp3" -Force
+```
+
+腳本存放於 `powershell/1_Split_Audio.ps1`。
 
 ```powershell
 # 設定區
@@ -183,7 +202,25 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 
 此步驟改為掃描 `file/ori_mp3/`，檢查是否已有最終字幕。若無，則計算 MD5 ID 尋找對應的 CSV 與片段字幕進行合併。
 
-請將以下腳本存為 `2_Merge_SRT.ps1` 並執行。
+**參數說明**：
+
+- `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案
+- `-Force`：強制重新處理（忽略已存在的輸出檔案）
+
+**範例**：
+
+```powershell
+# 處理全部檔案
+.\powershell\2_Merge_SRT.ps1
+
+# 處理指定檔案
+.\powershell\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
+
+# 強制重新處理指定檔案
+.\powershell\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3" -Force
+```
+
+腳本存放於 `powershell/2_Merge_SRT.ps1`。
 
 ```powershell
 # 設定區
@@ -265,7 +302,25 @@ Write-Host "所有作業結束！"
 
 若您需要沒有時間碼的逐字稿，請執行此步驟。會將 `file/fin_srt/` 內的字幕轉為同名的 `.txt`。
 
-請將以下腳本存為 `3_Extract_Text.ps1` 並執行。
+**參數說明**：
+
+- `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案（可輸入 .mp3 或 .srt 檔名）
+- `-Force`：強制重新處理（忽略已存在的輸出檔案）
+
+**範例**：
+
+```powershell
+# 處理全部檔案
+.\powershell\3_Extract_Text.ps1
+
+# 處理指定檔案
+.\powershell\3_Extract_Text.ps1 -TargetFileName "my_video.mp3"
+
+# 強制重新處理指定檔案
+.\powershell\3_Extract_Text.ps1 -TargetFileName "my_video.srt" -Force
+```
+
+腳本存放於 `powershell/3_Extract_Text.ps1`。
 
 ```powershell
 # 設定區

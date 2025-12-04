@@ -39,6 +39,11 @@ uv 版本更新
 想在全域使用 OpenAI Whisper 的指令 (全域工具)
 `uv tool install openai-whisper --python 3.11`
 
+若執行 whisper 時出現 "UserWarning: FP16 is not supported on CPU; using FP32 instead"
+意思是：你的 Whisper 目前正在使用 CPU 跑，而不是 GPU
+請使用下面的指令重新安裝  OpenAI Whisper，強制指定 PyTorch 的 CUDA 12.1 倉庫
+`uv tool install openai-whisper --python 3.11 --reinstall --extra-index-url https://download.pytorch.org/whl/cu121`
+
 安裝完成後，你不需要手動下載模型 (它不吃 ggml)，直接跑指令，它會自動偵測 GPU (CUDA) 並下載對應的 .pt 模型
 
 範例：使用 medium 模型轉錄 mp4

@@ -54,8 +54,8 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 # 安裝 Python 3.11
 uv python install 3.11
 
-# 安裝 Whisper 為全域工具
-uv tool install openai-whisper --python 3.11
+# 安裝 Whisper 為全域工具，並強制指定 CUDA 12.1 (才能使用 GPU)
+uv tool install openai-whisper --python 3.11 --reinstall --extra-index-url https://download.pytorch.org/whl/cu121
 ```
 
 ### 使用流程

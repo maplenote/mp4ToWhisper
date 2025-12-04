@@ -8,3 +8,18 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Output / media files (ignore generated audio/video/subtitles/metadata)
+# ignore all files under these folders but allow .gitkeep to keep folders in repo
+file/ori_mp4/*
+!file/ori_mp4/.gitkeep
+file/ori_mp3/*
+!file/ori_mp3/.gitkeep
+file/tmp_mp3/*
+!file/tmp_mp3/.gitkeep
+file/tmp_csv/*
+!file/tmp_csv/.gitkeep
+file/tmp_srt/*
+!file/tmp_srt/.gitkeep
+file/fin_srt/*
+!file/fin_srt/.gitkeep

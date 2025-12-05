@@ -12,12 +12,12 @@
 - **靜音偵測切割**：自動偵測音訊中超過 8 秒的靜音區段，將音訊切割成多個片段
 - **避免 Whisper 幻覺**：透過切割避免 Whisper 因長靜音產生重複或錯誤的辨識結果
 - **時間軸校正**：自動將切割片段的時間軸還原至原始影片的正確位置
-- **批次處理**：支援一次處理多個影片/音訊檔案
+- **批次處理**：支援一次處理多個影片 / 音訊檔案
 - **單檔處理**：支援指定處理單一檔案，並可強制重新處理
 
 ## 📁 專案結構
 
-```
+```text
 mp4ToWhisper/
 ├── powershell/                 # PowerShell 腳本
 │   ├── 0_Prepare_And_Convert.ps1  # 建立資料夾、MP4 轉 MP3
@@ -26,7 +26,7 @@ mp4ToWhisper/
 │   └── 3_Extract_Text.ps1         # 提取純文字逐字稿
 ├── file/
 │   ├── ori_mp4/               # 原始影片檔
-│   ├── ori_mp3/               # 轉換後的 MP3（或手動放入）
+│   ├── ori_mp3/               # 轉換後的 MP3(或手動放入)
 │   ├── tmp_mp3/               # 切割後的 MP3 片段
 │   ├── tmp_csv/               # 切割資訊 (Offset)
 │   ├── tmp_srt/               # Whisper 辨識的片段字幕
@@ -47,13 +47,13 @@ mp4ToWhisper/
 - **Windows 11** / PowerShell 7.5+
 - **FFmpeg**：用於音訊處理
 - **uv**：Python 套件管理器
-- **NVIDIA GPU + CUDA**（建議）：加速語音辨識
+- **NVIDIA GPU + CUDA** (建議)：加速語音辨識
 
 ### 安裝步驟
 
 #### 1️⃣ 安裝 FFmpeg
 
-1. 前往 [FFmpeg Builds by Gyan](https://www.gyan.dev/ffmpeg/builds/) 下載最新的 **release full** 版本（建議 7.0+）
+1. 前往 [FFmpeg Builds by Gyan](https://www.gyan.dev/ffmpeg/builds/) 下載最新的 **release full** 版本 (建議 7.0+)
 2. 解壓縮到任意目錄，建議放在 `C:\Program Files\ffmpeg`
 3. 將 `C:\Program Files\ffmpeg\bin` 資料夾加入 windows 系統 PATH 環境變數
 4. 開啟新的 PowerShell 視窗，執行 `ffmpeg -version` 確認安裝成功
@@ -70,7 +70,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 git clone https://github.com/your-repo/mp4ToWhisper.git
 cd mp4ToWhisper
 
-# 安裝所有相依套件（含 PyTorch CUDA 版本）
+# 安裝所有相依套件(含 PyTorch CUDA 版本)
 uv sync
 ```
 
@@ -143,7 +143,7 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 .\powershell\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
 ```
 
-#### 5️⃣ （可選）提取純文字
+#### 5️⃣ (可選) 提取純文字
 
 ```powershell
 .\powershell\3_Extract_Text.ps1
@@ -151,12 +151,12 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 
 ## 📌 參數說明
 
-所有腳本（1~3）都支援以下參數：
+所有腳本 (1\~3) 都支援以下參數：
 
-| 參數 | 說明 |
-|------|------|
-| `-TargetFileName "檔案名.mp3"` | 指定只處理單一檔案 |
-| `-Force` | 強制重新處理（忽略已存在的輸出） |
+| 參數                          | 說明                |
+| --------------------------- | ----------------- |
+| `-TargetFileName "檔案名.mp3"` | 指定只處理單一檔案         |
+| `-Force`                    | 強制重新處理 (忽略已存在的輸出) |
 
 **範例**：
 
@@ -170,7 +170,7 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 本專案提供 Agent Prompt 範本，可搭配 AI 助手使用：
 
 - `.github/prompts/mp4.prompt.md`：從 MP4 開始的完整流程
-- `.github/prompts/mp3.prompt.md`：從 MP3 開始的流程（適用於手動轉換的音訊）
+- `.github/prompts/mp3.prompt.md`：從 MP3 開始的流程 (適用於手動轉換的音訊)
 
 ## 📖 詳細文件
 
@@ -182,14 +182,14 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 
 為避免檔名重複，切割後的檔案使用 MD5 雜湊產生唯一 ID：
 
-```
+```text
 原始檔案 → MD5 (16 bytes) → Base64 → 檔名安全格式 (22 碼)
 ```
 
 ### 靜音偵測參數
 
-- **閾值時間**：8 秒（超過此時間的靜音會被視為切割點）
-- **分貝閾值**：-50 dB（低於此音量視為靜音）
+- **閾值時間**：8 秒 (超過此時間的靜音會被視為切割點)
+- **分貝閾值**：-50 dB (低於此音量視為靜音)
 
 這些參數可在 `1_Split_Audio.ps1` 中調整。
 

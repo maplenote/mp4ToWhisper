@@ -25,3 +25,7 @@ file/fin_srt/*
 !file/fin_srt/.gitkeep
 file/tmp/*
 !file/tmp/.gitkeep
+
+# Whisper models (large binary files ~1.4GB)
+file/models/*
+!file/models/.gitkeep

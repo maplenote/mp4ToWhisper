@@ -3,6 +3,7 @@
 [![PowerShell](https://img.shields.io/badge/PowerShell-7.5+-blue.svg)](https://github.com/PowerShell/PowerShell)
 [![FFmpeg](https://img.shields.io/badge/FFmpeg-required-green.svg)](https://ffmpeg.org/)
 [![Whisper](https://img.shields.io/badge/OpenAI_Whisper-required-orange.svg)](https://github.com/openai/whisper)
+[![uv](https://img.shields.io/badge/uv-package_manager-purple.svg)](https://docs.astral.sh/uv/)
 
 專為解決「Whisper 處理長靜音導致異常循環」所設計的自動化字幕產生工具。
 
@@ -29,10 +30,12 @@ mp4ToWhisper/
 │   ├── tmp_mp3/               # 切割後的 MP3 片段
 │   ├── tmp_csv/               # 切割資訊 (Offset)
 │   ├── tmp_srt/               # Whisper 辨識的片段字幕
-│   └── fin_srt/               # 最終合併的字幕檔
+│   ├── fin_srt/               # 最終合併的字幕檔
+│   └── models/                # Whisper 模型存放目錄
 ├── .github/prompts/           # Agent Prompt 範本
 │   ├── mp4.prompt.md          # MP4 轉字幕流程
 │   └── mp3.prompt.md          # MP3 轉字幕流程
+├── pyproject.toml             # Python 專案設定
 ├── spec.md                    # 詳細 SOP 文件
 └── README.md
 ```
@@ -43,19 +46,56 @@ mp4ToWhisper/
 
 - **Windows 11** / PowerShell 7.5+
 - **FFmpeg**：用於音訊處理
-- **OpenAI Whisper**：用於語音辨識
+- **uv**：Python 套件管理器
+- **NVIDIA GPU + CUDA**（建議）：加速語音辨識
 
-### 安裝 Whisper（使用 uv）
+### 安裝步驟
+
+#### 1️⃣ 安裝 FFmpeg
+
+1. 前往 [FFmpeg Builds by Gyan](https://www.gyan.dev/ffmpeg/builds/) 下載最新的 **release full** 版本（建議 7.0+）
+2. 解壓縮到任意目錄，建議放在 `C:\Program Files\ffmpeg`
+3. 將 `C:\Program Files\ffmpeg\bin` 資料夾加入 windows 系統 PATH 環境變數
+4. 開啟新的 PowerShell 視窗，執行 `ffmpeg -version` 確認安裝成功
+
+#### 2️⃣ 安裝 uv 套件管理器
 
 ```powershell
-# 安裝 uv
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
 
-# 安裝 Python 3.11
-uv python install 3.11
+#### 3️⃣ 複製專案並安裝相依套件
 
-# 安裝 Whisper 為全域工具，並強制指定 CUDA 12.1 (才能使用 GPU)
-uv tool install openai-whisper --python 3.11 --reinstall --extra-index-url https://download.pytorch.org/whl/cu121
+```powershell
+git clone https://github.com/your-repo/mp4ToWhisper.git
+cd mp4ToWhisper
+
+# 安裝所有相依套件（含 PyTorch CUDA 版本）
+uv sync
+```
+
+**注意**：首次執行會下載約 2.5GB 的 PyTorch 相依套件，請確保網路暢通。
+
+#### 4️⃣ 下載 Whisper 模型
+
+首次執行辨識時會自動下載，或可手動預先下載：
+
+```powershell
+uv run whisper --model medium --model_dir "file/models" --help
+```
+
+模型約 1.5GB，存放在 `file/models/` 目錄中，不會被系統暫存清理刪除。
+
+#### 5️⃣ 測試 Whisper 是否正常運作
+
+```powershell
+uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "file/models" --language Chinese --output_format srt --output_dir "file/tmp"
+```
+
+執行後會在終端機直接顯示辨識後的內容 (輸出檔案會在 `file/tmp/test.srt`)：
+
+```text
+[00:00.000 --> 00:02.000] 這是測試用的語音
 ```
 
 ### 使用流程
@@ -83,11 +123,12 @@ uv tool install openai-whisper --python 3.11 --reinstall --extra-index-url https
 ```powershell
 $TmpMp3Dir = "file/tmp_mp3"
 $TmpSrtDir = "file/tmp_srt"
+$ModelDir = "file/models"
 
 Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
     $SrtPath = Join-Path $TmpSrtDir ($_.Name -replace ".mp3", ".srt")
     if (!(Test-Path $SrtPath)) {
-        whisper $_.FullName --model medium --language Chinese --device cuda --output_format srt --output_dir $TmpSrtDir --verbose False
+        uv run whisper $_.FullName --model medium --language Chinese --device cuda --output_format srt --output_dir $TmpSrtDir --model_dir $ModelDir --verbose False
     }
 }
 ```

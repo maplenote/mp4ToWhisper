@@ -18,36 +18,72 @@
 
 ## 步驟 0：環境建置
 
+### 安裝 FFmpeg
+
+FFmpeg 用於音訊格式轉換與靜音偵測，建議使用 7.0 以上版本。
+
+**Windows 手動安裝步驟**：
+
+1. 前往 [FFmpeg Builds by Gyan](https://www.gyan.dev/ffmpeg/builds/) 下載 **release full** 版本
+2. 解壓縮到任意目錄，例如 `C:\Program Files\ffmpeg`
+3. 將 `C:\Program Files\ffmpeg\bin` 加入 windows 系統 PATH 環境變數：
+   - 開啟「系統內容」→「進階系統設定」→「環境變數」
+   - 在「系統變數」中找到 `Path`，點擊「編輯」
+   - 新增 `C:\Program Files\ffmpeg\bin`
+4. 開啟新的 PowerShell 視窗，執行以下指令確認安裝成功：
+
+```powershell
+ffmpeg -version
+```
+
+### 安裝 uv 套件管理器
+
 檢查是否已安裝 uv
 `uv --version`
 
-檢查 uv 目前以安裝 python 版本
-`uv python find`
-
-windows 安裝 uv
+Windows 安裝 uv
 `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
-
-建議安裝 python 3.11 (Whisper 在 3.14.0 版本安裝會出錯)
-`uv python install 3.11`
 
 uv 版本更新
 `uv self update`
 
-更新 uv 所有已安裝的依賴包
-`uv tool upgrade --all`
+### 安裝專案相依套件
 
-想在全域使用 OpenAI Whisper 的指令 (全域工具)
-`uv tool install openai-whisper --python 3.11`
+在專案目錄下執行以下指令，會自動建立 `.venv` 虛擬環境並安裝所有相依套件（含 PyTorch CUDA 版本）：
 
-若執行 whisper 時出現 "UserWarning: FP16 is not supported on CPU; using FP32 instead"
-意思是：你的 Whisper 目前正在使用 CPU 跑，而不是 GPU
-請使用下面的指令重新安裝  OpenAI Whisper，強制指定 PyTorch 的 CUDA 12.1 倉庫
-`uv tool install openai-whisper --python 3.11 --reinstall --extra-index-url https://download.pytorch.org/whl/cu121`
+```powershell
+uv sync
+```
 
-安裝完成後，你不需要手動下載模型 (它不吃 ggml)，直接跑指令，它會自動偵測 GPU (CUDA) 並下載對應的 .pt 模型
+**注意**：首次執行會下載約 2.5GB 的 PyTorch 相依套件，請確保網路暢通。
 
-範例：使用 medium 模型轉錄 mp4
-`whisper "你的錄影檔名.mp4" --model medium --device cuda`
+### 下載 Whisper 模型
+
+首次執行辨識時會自動下載模型，或可手動預先下載：
+
+```powershell
+uv run whisper --model medium --model_dir "file/models" --help
+```
+
+模型存放在 `file/models/` 目錄中（約 1.5GB），不會被系統暫存清理刪除。
+
+### 測試 Whisper 是否正常運作
+
+```powershell
+uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "file/models" --language Chinese --output_format srt --output_dir "file/tmp"
+```
+
+執行後會在終端機直接顯示辨識後的內容 (輸出檔案會在 `file/tmp/test.srt`)：
+
+```text
+[00:00.000 --> 00:02.000] 這是測試用的語音
+```
+
+若顯示 "UserWarning: FP16 is not supported on CPU; using FP32 instead"，表示正在使用 CPU 執行。
+請確認已安裝 NVIDIA GPU 驅動程式，並檢查 `pyproject.toml` 中的 `extra-index-url` 設定。
+
+清除 uv 暫存檔案（不會影響專案內的 .venv 和 models）
+`uv cache clean`
 
 ## 步驟 1：準備資料夾與轉換 MP4 (Phase 1)
 
@@ -85,7 +121,7 @@ Offset 資訊會存入 `file/tmp_csv/{ID}.csv`。
 **參數說明**：
 
 - `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案
-- `-Force`：強制重新處理（忽略已存在的輸出檔案）
+- `-Force`：強制重新處理 (忽略已存在的輸出檔案)
 
 **範例**：
 
@@ -190,6 +226,7 @@ Write-Host "`n切割完成！" -ForegroundColor Green
 ```powershell
 $TmpMp3Dir = "file/tmp_mp3"
 $TmpSrtDir = "file/tmp_srt"
+$ModelDir = "file/models"  # 模型存放目錄（避免系統暫存被刪除）
 
 Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
     $SrtName = $_.Name -replace ".mp3", ".srt"
@@ -197,8 +234,8 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
     
     if (!(Test-Path $SrtPath)) {
         Write-Host "正在辨識 $($_.Name) ..." -ForegroundColor Yellow
-        # 注意: --output_dir 指定輸出目錄
-        whisper $_.FullName --model medium --language Chinese --device cuda --output_format srt --output_dir $TmpSrtDir --verbose False
+        # 使用 uv run 執行專案內安裝的 whisper
+        uv run whisper $_.FullName --model medium --language Chinese --device cuda --output_format srt --output_dir $TmpSrtDir --model_dir $ModelDir --verbose False
     }
 }
 ```
@@ -210,7 +247,7 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 **參數說明**：
 
 - `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案
-- `-Force`：強制重新處理（忽略已存在的輸出檔案）
+- `-Force`：強制重新處理 (忽略已存在的輸出檔案)
 
 **範例**：
 
@@ -309,8 +346,8 @@ Write-Host "所有作業結束！"
 
 **參數說明**：
 
-- `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案（可輸入 .mp3 或 .srt 檔名）
-- `-Force`：強制重新處理（忽略已存在的輸出檔案）
+- `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案 (可輸入 .mp3 或 .srt 檔名)
+- `-Force`：強制重新處理 (忽略已存在的輸出檔案)
 
 **範例**：
 
@@ -350,8 +387,9 @@ Write-Host "純文字提取完成！" -ForegroundColor Green
 
 ### SOP 總結
 
-1. **準備**：執行 `0_Prepare_And_Convert.ps1` (建立資料夾、MP4轉MP3)。
-2. **切割**：執行 `1_Split_Audio.ps1` (產出 chunk mp3 和 csv)。
-3. **辨識**：在終端機執行 `whisper` 批次指令 (產出 chunk srt)。
-4. **合併**：執行 `2_Merge_SRT.ps1` (產出 完整 srt)。
-5. **轉文**：執行 `3_Extract_Text.ps1` (產出 完整 txt)。
+1. **環境**：執行 `uv sync` (建立虛擬環境並安裝相依套件)。
+2. **準備**：執行 `.\powershell\0_Prepare_And_Convert.ps1` (建立資料夾、MP4 轉 MP3)。
+3. **切割**：執行 `.\powershell\1_Split_Audio.ps1` (產出 chunk mp3 和 csv)。
+4. **辨識**：在終端機執行 `uv run whisper` 批次指令 (產出 chunk srt)。
+5. **合併**：執行 `.\powershell\2_Merge_SRT.ps1` (產出 完整 srt)。
+6. **轉文**：執行 `.\powershell\3_Extract_Text.ps1` (產出 完整 txt)。

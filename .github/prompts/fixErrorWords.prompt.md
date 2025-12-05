@@ -31,9 +31,22 @@ agent: agent
 | 藍位              | 欄位     | 資料表欄位        |
 | 起床              | 銑床     | CNC 加工機台      |
 | 明系              | 明細     | 明細頁            |
+| 名系              | 明細     | 明細頁            |
+| 註意              | 注音     | 注音              |
+| 第一 B            | DB       | 資料庫的簡稱      |
+| 會總頁            | 彙總頁   | 查詢作業的首頁    |
+| 方程              | function | 程式碼術語        |
+| 方選              | function | 程式碼術語        |
 | PN-01-4 / PN01    | PLN014   | 程式代號格式      |
+| mutation          | markdown | Markdown          |
+| 卡密              | commit   | Git 提交          |
+| 佈置              | 複製     | 複製              |
+| 落 back           | rollback | 回復              |
+| 落背口            | rollback | 回復              |
+| 全線              | 權限     | 權限              |
 | gettings          | GET 參數 | HTTP 請求參數     |
 | bestnet           | basename | PHP 函式名稱      |
+| autolow           | autoload | autoload.php      |
 
 ## MCP 工具支援
 

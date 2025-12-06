@@ -83,6 +83,7 @@ foreach ($File in $Mp3Files) {
         $File.FullName, 
         "--model", $Model, 
         "--language", "Chinese",
+        "--device", "cuda",
         "--output_dir", $TmpSrtDir, 
         "--output_format", "srt",
         "--model_dir", $ModelsDir,

@@ -22,6 +22,7 @@ mp4ToWhisper/
 ├── powershell/                 # PowerShell 腳本
 │   ├── 0_Prepare_And_Convert.ps1  # 建立資料夾、MP4 轉 MP3
 │   ├── 1_Split_Audio.ps1          # 偵測靜音並切割音訊
+│   ├── 1.5_Run_whisper.ps1        # 執行 Whisper 辨識
 │   ├── 2_Merge_SRT.ps1            # 合併字幕並校正時間軸
 │   ├── 2.5_Fix_Error_Words.ps1    # 套用 AI 對照表修正字幕
 │   └── 3_Extract_Text.ps1         # 提取純文字逐字稿
@@ -125,16 +126,11 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 #### 3️⃣ Whisper 辨識
 
 ```powershell
-$TmpMp3Dir = "file/tmp_mp3"
-$TmpSrtDir = "file/tmp_srt"
-$ModelDir = "file/models"
+# 處理全部
+.\powershell\1.5_Run_whisper.ps1
 
-Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
-    $SrtPath = Join-Path $TmpSrtDir ($_.Name -replace ".mp3", ".srt")
-    if (!(Test-Path $SrtPath)) {
-        uv run whisper $_.FullName --model medium --language Chinese --device cuda --output_format srt --output_dir $TmpSrtDir --model_dir $ModelDir --verbose False
-    }
-}
+# 處理指定檔案
+.\powershell\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3"
 ```
 
 #### 4️⃣ 合併字幕
@@ -164,7 +160,7 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 輸出結果：
 
 - `file/merge_srt/{filename}_ai.srt` - AI 優化後的字幕
-- `file/fin_srt/{filename}.srt` - 最終字幕 (複製自 _ai.srt)
+- `file/fin_srt/{filename}.srt` - 最終字幕 (複製自 \_ai.srt)
 
 #### 5️⃣ (可選) 提取純文字
 
@@ -178,7 +174,7 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 
 | 參數                          | 說明                |
 | --------------------------- | ----------------- |
-| `-TargetFileName "檔案名.mp3"` | 指定只處理單一檔案         |
+| `-TargetFileName "檔案名.mp3"` | 指定只處理單一檔案 (需為原始檔名) |
 | `-Force`                    | 強制重新處理 (忽略已存在的輸出) |
 
 **範例**：

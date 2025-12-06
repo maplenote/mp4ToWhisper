@@ -222,23 +222,29 @@ Write-Host "`n切割完成！" -ForegroundColor Green
 
 批次辨識 `file/tmp_mp3/` 內的片段，並將 SRT 輸出至 `file/tmp_srt/`。
 
-請在 PowerShell 終端機直接輸入：
+**參數說明**：
+
+- `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案 (需為 `file/ori_mp3` 中的原始檔名)
+- `-Force`：強制重新處理 (忽略已存在的輸出檔案)
+- `-Model "medium"`：指定 Whisper 模型 (預設 medium)
+
+**範例**：
 
 ```powershell
-$TmpMp3Dir = "file/tmp_mp3"
-$TmpSrtDir = "file/tmp_srt"
-$ModelDir = "file/models"  # 模型存放目錄(避免系統暫存被刪除)
+# 處理全部檔案
+.\powershell\1.5_Run_whisper.ps1
 
-Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
-    $SrtName = $_.Name -replace ".mp3", ".srt"
-    $SrtPath = Join-Path $TmpSrtDir $SrtName
-    
-    if (!(Test-Path $SrtPath)) {
-        Write-Host "正在辨識 $($_.Name) ..." -ForegroundColor Yellow
-        # 使用 uv run 執行專案內安裝的 whisper
-        uv run whisper $_.FullName --model medium --language Chinese --device cuda --output_format srt --output_dir $TmpSrtDir --model_dir $ModelDir --verbose False
-    }
-}
+# 處理指定檔案
+.\powershell\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3"
+
+# 強制重新處理指定檔案
+.\powershell\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3" -Force
+```
+
+腳本存放於 `powershell/1.5_Run_whisper.ps1`。
+
+```powershell
+# (腳本內容略，請直接執行檔案)
 ```
 
 ## 步驟 4：合併字幕並校正時間軸 (Phase 4)
@@ -461,7 +467,7 @@ Write-Host "純文字提取完成！" -ForegroundColor Green
 1. **環境**：執行 `uv sync` (建立虛擬環境並安裝相依套件)。
 2. **準備**：執行 `.\powershell\0_Prepare_And_Convert.ps1` (建立資料夾、MP4 轉 MP3)。
 3. **切割**：執行 `.\powershell\1_Split_Audio.ps1` (產出 chunk mp3 和 csv)。
-4. **辨識**：在終端機執行 `uv run whisper` 批次指令 (產出 chunk srt)。
+4. **辨識**：執行 `.\powershell\1.5_Run_whisper.ps1` (產出 chunk srt)。
 5. **合併**：執行 `.\powershell\2_Merge_SRT.ps1` (產出 完整 srt)。
 6. **修正**：執行 `.\powershell\2.5_Fix_Error_Words.ps1` (自動修正常見辨識錯誤)。
 7. **轉文**：執行 `.\powershell\3_Extract_Text.ps1` (產出 完整 txt)。

@@ -1,4 +1,5 @@
-We're going to be using slash command from `powershell\`
+We're going to be using slash command from `powershell\`.
+Use `pwsh` for PowerShell 7+ commands.
 
 ## Modes
 

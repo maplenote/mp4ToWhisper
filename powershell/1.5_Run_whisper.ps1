@@ -9,7 +9,7 @@ $BaseDir = Join-Path $PSScriptRoot ".."
 $OriMp3Dir = Join-Path $BaseDir "file/ori_mp3"
 $TmpMp3Dir = Join-Path $BaseDir "file/tmp_mp3"
 $TmpSrtDir = Join-Path $BaseDir "file/tmp_srt"
-$ModelsDir = Join-Path $BaseDir "models"
+$ModelsDir = Join-Path $BaseDir "file/models"
 
 # 確保輸出目錄存在
 if (-not (Test-Path $TmpSrtDir)) {
@@ -82,6 +82,7 @@ foreach ($File in $Mp3Files) {
         "whisper", 
         $File.FullName, 
         "--model", $Model, 
+        "--language", "Chinese",
         "--output_dir", $TmpSrtDir, 
         "--output_format", "srt",
         "--model_dir", $ModelsDir,

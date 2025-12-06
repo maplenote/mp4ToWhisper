@@ -29,21 +29,8 @@ agent: agent
 ### 步驟 3：Whisper 辨識
 
 ```powershell
-$BaseDir = "."
-$TmpMp3Dir = Join-Path $BaseDir "file/tmp_mp3"
-$TmpSrtDir = Join-Path $BaseDir "file/tmp_srt"
-$TargetPattern = "{{對應的FileID}}_chunk_*.mp3"
-
-Get-ChildItem "$TmpMp3Dir/$TargetPattern" | ForEach-Object {
-    $SrtPath = Join-Path $TmpSrtDir ($_.Name -replace ".mp3", ".srt")
-    if (!(Test-Path $SrtPath)) {
-        Write-Host "正在辨識 $($_.Name) ..." -ForegroundColor Yellow
-        whisper $_.FullName --model medium --language Chinese --device cuda --output_format srt --output_dir $TmpSrtDir --verbose False
-    }
-}
+.\powershell\1.5_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
-
-> 注意：FileID 為 MP3 檔案的 MD5 Base64 編碼（22 碼），可從步驟 2 的輸出中取得。
 
 ### 步驟 4：合併字幕
 
@@ -51,7 +38,13 @@ Get-ChildItem "$TmpMp3Dir/$TargetPattern" | ForEach-Object {
 .\powershell\2_Merge_SRT.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
-### 步驟 5：（可選）提取純文字
+### 步驟 5：AI 優化字幕（可選）
+
+```powershell
+.\powershell\2.5_Fix_Error_Words.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+```
+
+### 步驟 6：（可選）提取純文字
 
 ```powershell
 .\powershell\3_Extract_Text.ps1 -TargetFileName "{{檔案名稱}}.mp3"

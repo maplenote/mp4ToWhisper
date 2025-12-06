@@ -442,24 +442,30 @@ file/fin_srt/
 腳本存放於 `powershell/3_Extract_Text.ps1`。
 
 ```powershell
-# 設定區
-$FinSrtDir = "file/fin_srt"
+# (腳本內容略，請直接執行檔案)
+```
 
-# --- 腳本邏輯開始 ---
-Get-ChildItem "$FinSrtDir/*.srt" | ForEach-Object {
-    $InputSrt = $_.FullName
-    $OutputTxt = $_.FullName -replace ".srt", ".txt"
-    
-    Write-Host "正在提取文字: $($_.Name)"
-    
-    $Content = Get-Content $InputSrt -Raw
-    $TextOnly = $Content -replace '(?m)^\d+\r?\n', '' `
-                         -replace '(?m)^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n', '' `
-                         -replace '(?m)^\s*[\r\n]+', "`r`n" 
+## 步驟 6：清空暫存資料夾 (Cleanup)
 
-    $TextOnly | Set-Content $OutputTxt -Encoding UTF8
-}
-Write-Host "純文字提取完成！" -ForegroundColor Green
+當專案執行完畢或需要重置環境時，可使用此腳本清空 `file/` 下除了 `models` 以外的所有資料夾內容。
+此腳本會保留所有 `.gitkeep` 檔案以維持目錄結構。
+
+**參數說明**：
+
+- `-Force`：強制刪除 (不詢問確認)
+- `-DryRun`：模擬執行 (僅列出會被刪除的檔案，不實際刪除)
+
+**範例**：
+
+```powershell
+# 互動式確認後刪除
+.\powershell\Clear_File_Dir.ps1
+
+# 強制刪除
+.\powershell\Clear_File_Dir.ps1 -Force
+
+# 模擬刪除
+.\powershell\Clear_File_Dir.ps1 -DryRun
 ```
 
 ### SOP 總結
@@ -471,3 +477,4 @@ Write-Host "純文字提取完成！" -ForegroundColor Green
 5. **合併**：執行 `.\powershell\2_Merge_SRT.ps1` (產出 完整 srt)。
 6. **修正**：執行 `.\powershell\2.5_Fix_Error_Words.ps1` (自動修正常見辨識錯誤)。
 7. **轉文**：執行 `.\powershell\3_Extract_Text.ps1` (產出 完整 txt)。
+8. **清理**：執行 `.\powershell\Clear_File_Dir.ps1` (清空暫存檔，保留 models/ 與 .gitkeep)。

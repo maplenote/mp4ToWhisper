@@ -7,6 +7,16 @@
 
 專為解決「Whisper 處理長靜音導致異常循環」所設計的自動化字幕產生工具。
 
+## How to Start?
+
+1. 確認環境有 uv 與 FFmpeg 與 PowerShell 7.5+
+2. uv sync 安裝相依套件 (預計約 2.5GB，第一次執行轉檔還會下載 Whisper 模型，預計約 1.5GB)
+3. 將 MP4 放入 `file/ori_mp4/` ，若只有 MP3 可放入 `file/ori_mp3/`
+4. 開啟 vscode 或 gemini cli 
+   - vscode 選擇使用 /mp4 或 /mp3 指示轉檔
+   - gemini cli 使用 @YOLO_PROMPT.md 或 @SAFE_MODE_PROMPT.md 指示轉檔
+5. 等待轉檔完成，最終字幕會放在 `file/fin_srt/`
+
 ## 🎯 核心功能
 
 - **靜音偵測切割**：自動偵測音訊中超過 8 秒的靜音區段，將音訊切割成多個片段
@@ -25,7 +35,8 @@ mp4ToWhisper/
 │   ├── 1.5_Run_whisper.ps1        # 執行 Whisper 辨識
 │   ├── 2_Merge_SRT.ps1            # 合併字幕並校正時間軸
 │   ├── 2.5_Fix_Error_Words.ps1    # 套用 AI 對照表修正字幕
-│   └── 3_Extract_Text.ps1         # 提取純文字逐字稿
+│   ├── 3_Extract_Text.ps1         # 提取純文字逐字稿
+│   └── Clear_File_Dir.ps1         # 清空暫存資料夾 (保留 models 與 .gitkeep)
 ├── file/
 │   ├── ori_mp4/               # 原始影片檔
 │   ├── ori_mp3/               # 轉換後的 MP3(或手動放入)
@@ -166,6 +177,21 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 
 ```powershell
 .\powershell\3_Extract_Text.ps1
+```
+
+#### 6️⃣ (可選) 清空暫存資料夾
+
+當專案執行完畢，可使用此腳本清空 `file/` 下除了 `models` 以外的所有資料夾內容 (會保留 `.gitkeep`)。
+
+```powershell
+# 互動式確認後刪除
+.\powershell\Clear_File_Dir.ps1
+
+# 強制刪除 (不詢問)
+.\powershell\Clear_File_Dir.ps1 -Force
+
+# 模擬刪除 (僅列出會被刪除的檔案)
+.\powershell\Clear_File_Dir.ps1 -DryRun
 ```
 
 ## 📌 參數說明

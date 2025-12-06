@@ -59,22 +59,12 @@ file/fin_srt/
    - 輸出 `file/merge_srt/{檔名}_ai.srt`
    - 複製至 `file/fin_srt/{檔名}.srt`
 
-## MCP 工具支援
+## MCP 工具支援 (可選，限內部專用)
 
-若需要查詢資料庫的資料表結構以確認正確的欄位名稱或專有名詞，可使用：
+請確定有安裝 fepmdbdoc 這個 MCP 工具 (內部專案)，使用 #tableSchema 可取得 `資料庫. 資料表` 結構 (markdown 格式)：
 
 ```
-#mcp_fepmdbdoc_tableSchema
-```
-
-### 使用範例
-
-查詢 `fepmbusiness.fpstationdriverdef` 資料表：
-
-```json
-{
-  "db.table": "fepmbusiness.fpstationdriverdef"
-}
+#mcp_fepmdbdoc_tableSchema 資料庫.資料表
 ```
 
 ## 執行流程

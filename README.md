@@ -23,6 +23,7 @@ mp4ToWhisper/
 │   ├── 0_Prepare_And_Convert.ps1  # 建立資料夾、MP4 轉 MP3
 │   ├── 1_Split_Audio.ps1          # 偵測靜音並切割音訊
 │   ├── 2_Merge_SRT.ps1            # 合併字幕並校正時間軸
+│   ├── 2.5_Fix_Error_Words.ps1    # 套用 AI 對照表修正字幕
 │   └── 3_Extract_Text.ps1         # 提取純文字逐字稿
 ├── file/
 │   ├── ori_mp4/               # 原始影片檔
@@ -30,11 +31,14 @@ mp4ToWhisper/
 │   ├── tmp_mp3/               # 切割後的 MP3 片段
 │   ├── tmp_csv/               # 切割資訊 (Offset)
 │   ├── tmp_srt/               # Whisper 辨識的片段字幕
-│   ├── fin_srt/               # 最終合併的字幕檔
+│   ├── merge_srt/             # 合併字幕 (*_merge.srt)、AI 對照表 (*.json)、AI 優化字幕 (*_ai.srt)
+│   ├── fin_srt/               # 最終字幕檔
 │   └── models/                # Whisper 模型存放目錄
 ├── .github/prompts/           # Agent Prompt 範本
 │   ├── mp4.prompt.md          # MP4 轉字幕流程
-│   └── mp3.prompt.md          # MP3 轉字幕流程
+│   ├── mp3.prompt.md          # MP3 轉字幕流程
+│   ├── fixErrorWords.prompt.md # AI 優化字幕流程
+│   └── errorWords.json        # 錯誤對照表範本
 ├── pyproject.toml             # Python 專案設定
 ├── spec.md                    # 詳細 SOP 文件
 └── README.md
@@ -142,6 +146,25 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 # 處理指定檔案
 .\powershell\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
 ```
+
+合併後的字幕會存入 `file/merge_srt/{filename}_merge.srt`。
+
+#### 4.5️⃣ AI 優化字幕 (可選)
+
+使用 AI Agent 根據主題產生專用的錯誤對照表，並套用修正：
+
+1. 使用 `.github/prompts/fixErrorWords.prompt.md` 提示 AI
+2. AI 產生 `file/merge_srt/{filename}.json` 對照表
+3. 執行腳本套用修正：
+
+```powershell
+.\powershell\2.5_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
+```
+
+輸出結果：
+
+- `file/merge_srt/{filename}_ai.srt` - AI 優化後的字幕
+- `file/fin_srt/{filename}.srt` - 最終字幕 (複製自 _ai.srt)
 
 #### 5️⃣ (可選) 提取純文字
 

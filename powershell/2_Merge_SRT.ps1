@@ -8,7 +8,12 @@ $BaseDir = Join-Path $PSScriptRoot ".."
 $OriMp3Dir = Join-Path $BaseDir "file/ori_mp3"
 $TmpCsvDir = Join-Path $BaseDir "file/tmp_csv"
 $TmpSrtDir = Join-Path $BaseDir "file/tmp_srt"
-$FinSrtDir = Join-Path $BaseDir "file/fin_srt"
+$MergeSrtDir = Join-Path $BaseDir "file/merge_srt"  # 第一次合併輸出目錄
+
+# 確保 merge_srt 目錄存在
+if (-not (Test-Path $MergeSrtDir)) {
+    New-Item -ItemType Directory -Path $MergeSrtDir -Force | Out-Null
+}
 
 # 決定要處理的檔案列表
 if ($TargetFileName) {
@@ -26,12 +31,12 @@ if ($TargetFileName) {
 $FilesToProcess | ForEach-Object {
     $InputFile = $_
     $BaseName = $InputFile.BaseName
-    $FinalSrtName = "$BaseName.srt"
-    $OutputFile = Join-Path $FinSrtDir $FinalSrtName
+    $MergeSrtName = "${BaseName}_merge.srt"  # 合併後的檔名格式
+    $OutputFile = Join-Path $MergeSrtDir $MergeSrtName
 
-    # 1. 檢查是否已存在最終字幕
+    # 1. 檢查是否已存在合併字幕
     if ((Test-Path $OutputFile) -and (-not $Force)) {
-        Write-Host "跳過: $FinalSrtName (檔案已存在，使用 -Force 強制重跑)" -ForegroundColor DarkGray
+        Write-Host "跳過: $MergeSrtName (檔案已存在，使用 -Force 強制重跑)" -ForegroundColor DarkGray
         return # 繼續處理下一個檔案
     }
 
@@ -89,6 +94,6 @@ $FilesToProcess | ForEach-Object {
             }
         }
     }
-    Write-Host "  合併完成 -> $FinalSrtName" -ForegroundColor Green
+    Write-Host "  合併完成 -> $MergeSrtName" -ForegroundColor Green
 }
 Write-Host "所有作業結束！"

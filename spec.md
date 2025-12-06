@@ -14,7 +14,8 @@
 - `file/tmp_mp3/`: 切割後的 MP3 片段
 - `file/tmp_csv/`: 切割片段的 Offset 資訊
 - `file/tmp_srt/`: Whisper 辨識出的片段字幕
-- `file/fin_srt/`: 最終合併的字幕檔
+- `file/merge_srt/`: 合併後的字幕 (`_merge.srt`)、AI 對照表 (`.json`)、AI 優化字幕 (`_ai.srt`)
+- `file/fin_srt/`: 最終字幕檔
 
 ## 步驟 0：環境建置
 
@@ -49,7 +50,7 @@ uv 版本更新
 
 ### 安裝專案相依套件
 
-在專案目錄下執行以下指令，會自動建立 `.venv` 虛擬環境並安裝所有相依套件（含 PyTorch CUDA 版本）：
+在專案目錄下執行以下指令，會自動建立 `.venv` 虛擬環境並安裝所有相依套件 (含 PyTorch CUDA 版本)：
 
 ```powershell
 uv sync
@@ -65,7 +66,7 @@ uv sync
 uv run whisper --model medium --model_dir "file/models" --help
 ```
 
-模型存放在 `file/models/` 目錄中（約 1.5GB），不會被系統暫存清理刪除。
+模型存放在 `file/models/` 目錄中 (約 1.5GB)，不會被系統暫存清理刪除。
 
 ### 測試 Whisper 是否正常運作
 
@@ -82,7 +83,7 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 若顯示 "UserWarning: FP16 is not supported on CPU; using FP32 instead"，表示正在使用 CPU 執行。
 請確認已安裝 NVIDIA GPU 驅動程式，並檢查 `pyproject.toml` 中的 `extra-index-url` 設定。
 
-清除 uv 暫存檔案（不會影響專案內的 .venv 和 models）
+清除 uv 暫存檔案 (不會影響專案內的 .venv 和 models)
 `uv cache clean`
 
 ## 步驟 1：準備資料夾與轉換 MP4 (Phase 1)
@@ -226,7 +227,7 @@ Write-Host "`n切割完成！" -ForegroundColor Green
 ```powershell
 $TmpMp3Dir = "file/tmp_mp3"
 $TmpSrtDir = "file/tmp_srt"
-$ModelDir = "file/models"  # 模型存放目錄（避免系統暫存被刪除）
+$ModelDir = "file/models"  # 模型存放目錄(避免系統暫存被刪除)
 
 Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
     $SrtName = $_.Name -replace ".mp3", ".srt"
@@ -242,7 +243,8 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 
 ## 步驟 4：合併字幕並校正時間軸 (Phase 4)
 
-此步驟改為掃描 `file/ori_mp3/`，檢查是否已有最終字幕。若無，則計算 MD5 ID 尋找對應的 CSV 與片段字幕進行合併。
+此步驟會掃描 `file/ori_mp3/`，計算 MD5 ID 尋找對應的 CSV 與片段字幕進行合併。
+合併後的字幕會存入 `file/merge_srt/`，命名格式為 `{原檔名}_merge.srt`。
 
 **參數說明**：
 
@@ -269,18 +271,18 @@ Get-ChildItem "$TmpMp3Dir/*.mp3" | ForEach-Object {
 $OriMp3Dir = "file/ori_mp3"
 $TmpCsvDir = "file/tmp_csv"
 $TmpSrtDir = "file/tmp_srt"
-$FinSrtDir = "file/fin_srt"
+$MergeSrtDir = "file/merge_srt"  # 合併輸出目錄
 
 # --- 腳本邏輯開始 ---
 Get-ChildItem "$OriMp3Dir/*.mp3" | ForEach-Object {
     $InputFile = $_
     $BaseName = $InputFile.BaseName
-    $FinalSrtName = "$BaseName.srt"
-    $OutputFile = Join-Path $FinSrtDir $FinalSrtName
+    $MergeSrtName = "${BaseName}_merge.srt"
+    $OutputFile = Join-Path $MergeSrtDir $MergeSrtName
 
-    # 1. 檢查是否已存在最終字幕
+    # 1. 檢查是否已存在合併字幕
     if (Test-Path $OutputFile) {
-        Write-Host "跳過: $FinalSrtName (檔案已存在)" -ForegroundColor DarkGray
+        Write-Host "跳過: $MergeSrtName (檔案已存在)" -ForegroundColor DarkGray
         return # 繼續處理下一個檔案
     }
 
@@ -335,10 +337,79 @@ Get-ChildItem "$OriMp3Dir/*.mp3" | ForEach-Object {
             }
         }
     }
-    Write-Host "  合併完成 -> $FinalSrtName" -ForegroundColor Green
+    Write-Host "  合併完成 -> $MergeSrtName" -ForegroundColor Green
 }
 Write-Host "所有作業結束！"
 ```
+
+## 步驟 4.5：AI 優化辨識錯誤文字 (Phase 4.5)
+
+此步驟由 AI Agent 根據當次辨識的主題，分析 `file/merge_srt/` 內的 `_merge.srt` 字幕檔，產生專用的錯誤對照表並套用修正。
+
+### 檔案命名規則
+
+```text
+file/merge_srt/
+├── {檔名}_merge.srt   # 步驟 4 合併的原始字幕
+├── {檔名}.json        # AI 產生的專用對照表
+└── {檔名}_ai.srt      # AI 優化後的字幕
+
+file/fin_srt/
+└── {檔名}.srt         # 最終字幕 (複製自 _ai.srt)
+```
+
+### 範本對照表
+
+範本位於 `.github/prompts/errorWords.json`，包含程式術語、框架名稱等常見辨識錯誤供 AI 參考。
+
+### AI Agent 使用方式
+
+使用 `.github/prompts/fixErrorWords.prompt.md` 提示詞，AI 會：
+
+1. 讀取 `_merge.srt` 字幕內容
+2. 根據主題識別可能的辨識錯誤
+3. 產生 `{檔名}.json` 專用對照表
+4. 套用修正並輸出 `{檔名}_ai.srt`
+5. 複製至 `file/fin_srt/{檔名}.srt`
+
+### PowerShell 輔助腳本
+
+完成 JSON 對照表後，可執行腳本自動套用：
+
+```powershell
+# 處理全部檔案
+.\powershell\2.5_Fix_Error_Words.ps1
+
+# 處理指定檔案
+.\powershell\2.5_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
+
+# 強制重新處理
+.\powershell\2.5_Fix_Error_Words.ps1 -Force
+```
+
+### 對照表 JSON 結構
+
+```json
+{
+  "version": "1.0",
+  "description": "針對 {主題} 的錯誤對照表",
+  "topic": "{辨識主題}",
+  "mappings": [
+    {
+      "wrong": ["錯誤寫法1", "錯誤寫法2"],
+      "correct": "正確文字",
+      "category": "database",
+      "note": "說明"
+    }
+  ]
+}
+```
+
+這種設計的優點：
+
+- 每次辨識都有專屬的對照表，方便追蹤
+- `_merge.srt` 與 `_ai.srt` 並存，可用 diff 比對修改內容
+- JSON 檔案可累積為知識庫，改善未來辨識品質
 
 ## 步驟 5：產生純文字檔 (Phase 5)
 
@@ -392,4 +463,5 @@ Write-Host "純文字提取完成！" -ForegroundColor Green
 3. **切割**：執行 `.\powershell\1_Split_Audio.ps1` (產出 chunk mp3 和 csv)。
 4. **辨識**：在終端機執行 `uv run whisper` 批次指令 (產出 chunk srt)。
 5. **合併**：執行 `.\powershell\2_Merge_SRT.ps1` (產出 完整 srt)。
-6. **轉文**：執行 `.\powershell\3_Extract_Text.ps1` (產出 完整 txt)。
+6. **修正**：執行 `.\powershell\2.5_Fix_Error_Words.ps1` (自動修正常見辨識錯誤)。
+7. **轉文**：執行 `.\powershell\3_Extract_Text.ps1` (產出 完整 txt)。

@@ -1,0 +1,145 @@
+{
+  "version": "1.0",
+  "description": "Whisper 語音辨識常見錯誤對照表 - 範本檔案",
+  "usage": "此檔案為範本，AI Agent 會根據每次辨識的主題，在 file/merge_srt/ 目錄下產生專用的 {檔名}.json",
+  "mappings": [
+    {
+      "wrong": ["Larrable", "layer", "拉拉貝爾"],
+      "correct": "Laravel",
+      "category": "framework",
+      "note": "PHP 框架名稱"
+    },
+    {
+      "wrong": ["Zachary", "Jackery", "傑克瑞"],
+      "correct": "jQuery",
+      "category": "library",
+      "note": "JavaScript 函式庫"
+    },
+    {
+      "wrong": ["Keyleth", "key裡斯"],
+      "correct": "keyid",
+      "category": "code",
+      "note": "程式碼變數名稱"
+    },
+    {
+      "wrong": ["藍位", "蘭位"],
+      "correct": "欄位",
+      "category": "database",
+      "note": "資料表欄位"
+    },
+    {
+      "wrong": ["起床"],
+      "correct": "銑床",
+      "category": "manufacturing",
+      "note": "CNC 加工機台"
+    },
+    {
+      "wrong": ["明系", "名系", "明習"],
+      "correct": "明細",
+      "category": "ui",
+      "note": "明細頁"
+    },
+    {
+      "wrong": ["註意"],
+      "correct": "注音",
+      "category": "general",
+      "note": "注音"
+    },
+    {
+      "wrong": ["第一B", "第一 B", "迪比"],
+      "correct": "DB",
+      "category": "database",
+      "note": "資料庫的簡稱"
+    },
+    {
+      "wrong": ["會總頁", "匯總頁"],
+      "correct": "彙總頁",
+      "category": "ui",
+      "note": "查詢作業的首頁"
+    },
+    {
+      "wrong": ["方程", "方選", "方程式"],
+      "correct": "function",
+      "category": "code",
+      "note": "程式碼術語"
+    },
+    {
+      "wrong": ["PN-01-4", "PN014", "PN01", "P N 014"],
+      "correct": "PLN014",
+      "category": "code",
+      "note": "程式代號格式"
+    },
+    {
+      "wrong": ["mutation", "謬傳"],
+      "correct": "Markdown",
+      "category": "format",
+      "note": "Markdown 格式"
+    },
+    {
+      "wrong": ["卡密", "卡米特"],
+      "correct": "commit",
+      "category": "git",
+      "note": "Git 提交"
+    },
+    {
+      "wrong": ["佈置"],
+      "correct": "複製",
+      "category": "general",
+      "note": "複製操作"
+    },
+    {
+      "wrong": ["落back", "落 back", "落背口", "落貝克"],
+      "correct": "rollback",
+      "category": "database",
+      "note": "回復操作"
+    },
+    {
+      "wrong": ["全線", "泉線"],
+      "correct": "權限",
+      "category": "system",
+      "note": "權限設定"
+    },
+    {
+      "wrong": ["gettings", "給停斯"],
+      "correct": "GET 參數",
+      "category": "http",
+      "note": "HTTP 請求參數"
+    },
+    {
+      "wrong": ["bestnet", "貝斯內"],
+      "correct": "basename",
+      "category": "code",
+      "note": "PHP 函式名稱"
+    },
+    {
+      "wrong": ["autolow", "奧托羅"],
+      "correct": "autoload",
+      "category": "code",
+      "note": "autoload.php"
+    },
+    {
+      "wrong": ["披餓批", "披HP"],
+      "correct": "PHP",
+      "category": "language",
+      "note": "PHP 程式語言"
+    },
+    {
+      "wrong": ["傑斯", "接送"],
+      "correct": "JSON",
+      "category": "format",
+      "note": "JSON 格式"
+    },
+    {
+      "wrong": ["阿賊客", "阿傑克斯"],
+      "correct": "AJAX",
+      "category": "http",
+      "note": "非同步請求"
+    },
+    {
+      "wrong": ["艾匹愛", "API愛"],
+      "correct": "API",
+      "category": "code",
+      "note": "應用程式介面"
+    }
+  ]
+}

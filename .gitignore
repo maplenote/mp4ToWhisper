@@ -21,6 +21,8 @@ file/tmp_csv/*
 !file/tmp_csv/.gitkeep
 file/tmp_srt/*
 !file/tmp_srt/.gitkeep
+file/merge_srt/*
+!file/merge_srt/.gitkeep
 file/fin_srt/*
 !file/fin_srt/.gitkeep
 file/tmp/*

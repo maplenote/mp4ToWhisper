@@ -24,17 +24,19 @@ Execute the following steps in order.
    - Command: `powershell -ExecutionPolicy Bypass -File powershell/1.5_Run_whisper.ps1`
 4. **Merge SRT**
    - Command: `powershell -ExecutionPolicy Bypass -File powershell/2_Merge_SRT.ps1`
+5. **Convert S2T**
+   - Command: `powershell -ExecutionPolicy Bypass -File powershell/2.2_Convert_S2T.ps1`
 
 ### Phase 2: AI Analysis (Scoped Write Access)
 
-5. **Generate Correction JSONs**
+6. **Generate Correction JSONs**
    - **Action**: Read `file/merge_srt/*_merge.srt`.
    - **Action**: Create correction JSON files in `file/merge_srt/`.
    - **Constraint**: You may ONLY write to `file/merge_srt/{filename}.json`. Do NOT touch the SRT files.
 
 ### Phase 3: Finalization
 
-6. **Apply Fixes**
+7. **Apply Fixes**
    - Command: `powershell -ExecutionPolicy Bypass -File powershell/2.5_Fix_Error_Words.ps1`
-7. **Extract Text**
+8. **Extract Text**
    - Command: `powershell -ExecutionPolicy Bypass -File powershell/3_Extract_Text.ps1`

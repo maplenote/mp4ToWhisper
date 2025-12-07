@@ -156,6 +156,18 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 
 合併後的字幕會存入 `file/merge_srt/{filename}_merge.srt`。
 
+#### 4.2️⃣ 簡轉繁 (OpenCC)
+
+將合併後的簡體字幕轉換為繁體中文 (台灣正體)：
+
+```powershell
+# 處理全部
+.\powershell\2.2_Convert_S2T.ps1
+
+# 處理指定檔案
+.\powershell\2.2_Convert_S2T.ps1 -TargetFileName "my_video.mp3"
+```
+
 #### 4.5️⃣ AI 優化字幕 (可選)
 
 使用 AI Agent 根據主題產生專用的錯誤對照表，並套用修正：

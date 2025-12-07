@@ -26,7 +26,7 @@ if ($TargetFileName) {
 # --- 腳本邏輯開始 ---
 $FilesToProcess | ForEach-Object {
     $InputSrt = $_.FullName
-    $OutputTxt = $_.FullName -replace ".srt", ".txt"
+    $OutputTxt = [System.IO.Path]::ChangeExtension($_.FullName, ".txt")
     
     if ((Test-Path $OutputTxt) -and (-not $Force)) {
         Write-Host "跳過: $($_.Name) (檔案已存在，使用 -Force 強制重跑)" -ForegroundColor DarkGray

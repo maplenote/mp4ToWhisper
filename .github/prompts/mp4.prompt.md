@@ -38,13 +38,19 @@ agent: agent
 .\powershell\2_Merge_SRT.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
-### 步驟 5：AI 優化字幕（可選）
+### 步驟 5：簡轉繁 (OpenCC)
+
+```powershell
+.\powershell\2.2_Convert_S2T.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+```
+
+### 步驟 6：AI 優化字幕（可選）
 
 ```powershell
 .\powershell\2.5_Fix_Error_Words.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
-### 步驟 6：（可選）提取純文字
+### 步驟 7：（可選）提取純文字
 
 ```powershell
 .\powershell\3_Extract_Text.ps1 -TargetFileName "{{檔案名稱}}.mp3"

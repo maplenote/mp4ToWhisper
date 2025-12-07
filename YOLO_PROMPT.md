@@ -21,9 +21,13 @@ Execute the following steps in order. If a step fails, stop and report the error
    - Command: `powershell -ExecutionPolicy Bypass -File powershell/2_Merge_SRT.ps1`
    - Goal: Merge chunks back into `file/merge_srt/*_merge.srt`.
 
+5. **Convert S2T (OpenCC)**
+   - Command: `powershell -ExecutionPolicy Bypass -File powershell/2.2_Convert_S2T.ps1`
+   - Goal: Convert Simplified Chinese to Traditional Chinese.
+
 ## Phase 2: AI Analysis & Correction (Your Core Task)
 
-5. **Generate Correction JSONs**
+6. **Generate Correction JSONs**
    - **Input**: Read all files in `file/merge_srt/` ending with `_merge.srt`.
 
    - **Task**: For _each_ file, analyze the text for OCR/ASR errors (wrong homophones, broken technical terms).
@@ -45,10 +49,10 @@ Execute the following steps in order. If a step fails, stop and report the error
 
 ## Phase 3: Finalization
 
-6. **Apply Fixes**
+7. **Apply Fixes**
    - Command: `powershell -ExecutionPolicy Bypass -File powershell/2.5_Fix_Error_Words.ps1`
    - Goal: Apply JSON corrections and generate final SRTs in `file/fin_srt`.
 
-7. **Extract Text**
+8. **Extract Text**
    - Command: `powershell -ExecutionPolicy Bypass -File powershell/3_Extract_Text.ps1`
    - Goal: Extract pure text content.

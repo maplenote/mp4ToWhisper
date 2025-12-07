@@ -348,6 +348,20 @@ Get-ChildItem "$OriMp3Dir/*.mp3" | ForEach-Object {
 Write-Host "所有作業結束！"
 ```
 
+## 步驟 4.2：簡轉繁 (Phase 4.2)
+
+此步驟使用 OpenCC 將 `file/merge_srt/` 內的簡體字幕轉換為繁體中文 (台灣正體)。
+
+**參數說明**：
+
+- `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案
+
+**範例**：
+
+```powershell
+.\powershell\2.2_Convert_S2T.ps1
+```
+
 ## 步驟 4.5：AI 優化辨識錯誤文字 (Phase 4.5)
 
 此步驟由 AI Agent 根據當次辨識的主題，分析 `file/merge_srt/` 內的 `_merge.srt` 字幕檔，產生專用的錯誤對照表並套用修正。

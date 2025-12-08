@@ -2,6 +2,12 @@
 
 This document contains instructions for running the `mp4towhisper` pipeline using an AI CLI or Agent.
 
+> **Important**:
+>
+> 1. Use `pwsh` for all PowerShell commands.
+> 2. **Terminal Encoding**: Run `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` to fix garbled text in Windows terminals.
+> 3. All SRT files and source code in this project are encoded in **UTF-8**. When reading filenames or content, ensure you are using UTF-8 encoding to prevent Chinese characters from becoming garbled.
+
 ## YOLO Mode (Autonomous Execution)
 
 To run the entire pipeline from start to finish, follow these steps in order.
@@ -37,6 +43,8 @@ Merge the chunked SRT files back into a single sequence.
 ### Step 5: AI Error Correction (Agent Task)
 
 **This step requires the AI Agent to generate correction data.**
+
+> **Note**: Ensure you read the SRT files using **UTF-8** encoding.
 
 1. **Scan**: Look for `*_merge.srt` files in `file/merge_srt`.
 2. **Analyze**: For each file, read the content and identify phonetic errors, typos, or contextually incorrect terms (especially technical terms).
@@ -81,6 +89,8 @@ You can directly use the file [YOLO_PROMPT.md](YOLO_PROMPT.md) as your instructi
 
 Or copy and paste this into your AI CLI to run the full pipeline:
 
+> *Note: Use `pwsh` and ensure UTF-8 encoding for all file operations.*
+>
 > **Execute the mp4towhisper pipeline in YOLO mode.**
 >
 > 1. Run `powershell/0_Prepare_And_Convert.ps1`.

@@ -35,7 +35,7 @@ $FilesToProcess | ForEach-Object {
 
     Write-Host "正在提取文字: $($_.Name)"
     
-    $Content = Get-Content $InputSrt -Raw
+    $Content = Get-Content $InputSrt -Raw -Encoding UTF8
     $TextOnly = $Content -replace '(?m)^\d+\r?\n', '' `
                          -replace '(?m)^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n', '' `
                          -replace '(?m)^\s*[\r\n]+', "`r`n" 

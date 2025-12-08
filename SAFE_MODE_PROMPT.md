@@ -13,6 +13,7 @@ You must adhere to the following **STRICT SECURITY PROTOCOLS**.
 ## Execution Steps
 
 Execute the following steps in order.
+> **Note**: Use `pwsh` for all PowerShell commands.
 
 ### Phase 1: Audio Processing
 
@@ -28,6 +29,8 @@ Execute the following steps in order.
    - Command: `powershell -ExecutionPolicy Bypass -File powershell/2.2_Convert_S2T.ps1`
 
 ### Phase 2: AI Analysis (Scoped Write Access)
+
+> **Important**: All SRT files are **UTF-8** encoded. Ensure you read them as UTF-8 to avoid garbled Chinese characters.
 
 6. **Generate Correction JSONs**
    - **Action**: Read `file/merge_srt/*_merge.srt`.

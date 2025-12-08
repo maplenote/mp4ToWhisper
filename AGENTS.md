@@ -1,10 +1,12 @@
+# AI Agent Instructions
+
+請用正體中文與我溝通，協助我完成以下任務。
 We're going to be using slash command from `pwsh\`.
 Use `pwsh` for PowerShell 7+ commands.
 
 > **Important**:
 >
-> 1. Run `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` to fix garbled text in Windows terminals.
-> 2. All SRT files and source code in this project are encoded in **UTF-8**. When reading filenames or content, ensure you are using UTF-8 encoding to prevent Chinese characters from becoming garbled.
+> 1. All SRT files and source code in this project are encoded in **UTF-8**. When reading filenames or content, ensure you are using UTF-8 encoding to prevent Chinese characters from becoming garbled.
 
 ## Modes
 

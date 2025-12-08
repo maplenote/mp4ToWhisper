@@ -1,11 +1,12 @@
 # Gemini CLI / AI Agent Instructions
 
 This document contains instructions for running the `mp4towhisper` pipeline using an AI CLI or Agent.
+**MUST** 請用正體中文與我溝通。
 
 > **Important**:
 >
 > 1. Use `pwsh` for all PowerShell commands.
-> 2. **Terminal Encoding**: Run `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8` to fix garbled text in Windows terminals.
+> 2. **Terminal Encoding**: If you see garbled Chinese text in the terminal, try running `Shell echo "測試中文"` to verify. If it is garbled, please refer to [fixWinTerminalUtf8.md](fixWinTerminalUtf8.md) for solutions.
 > 3. All SRT files and source code in this project are encoded in **UTF-8**. When reading filenames or content, ensure you are using UTF-8 encoding to prevent Chinese characters from becoming garbled.
 
 ## YOLO Mode (Autonomous Execution)
@@ -51,22 +52,22 @@ Merge the chunked SRT files back into a single sequence.
 3. **Generate JSON**: Create a JSON file named `{basename}.json` in `file/merge_srt/` (e.g., if file is `video_merge.srt`, create `video.json`).
 4. **JSON Format**:
 
-    ```json
-    {
-      "mappings": [
-        {
-          "correct": "正確詞彙",
-          "wrong": ["錯誤詞彙1", "錯誤詞彙2"]
-        },
-        {
-          "correct": "ProductModel",
-          "wrong": ["ProducModel", "ProductModle"]
-        }
-      ]
-    }
-    ```
+   ```json
+   {
+     "mappings": [
+       {
+         "correct": "正確詞彙",
+         "wrong": ["錯誤詞彙1", "錯誤詞彙2"]
+       },
+       {
+         "correct": "ProductModel",
+         "wrong": ["ProducModel", "ProductModle"]
+       }
+     ]
+   }
+   ```
 
-    *Note: Only generate the JSON file. Do not modify the SRT manually.*
+   **Note: Only generate the JSON file. Do not modify the SRT manually.**
 
 ### Step 6: Apply Fixes
 
@@ -89,8 +90,8 @@ You can directly use the file [YOLO_PROMPT.md](YOLO_PROMPT.md) as your instructi
 
 Or copy and paste this into your AI CLI to run the full pipeline:
 
-> *Note: Use `pwsh` and ensure UTF-8 encoding for all file operations.*
->
+**Note: Use `pwsh` and ensure UTF-8 encoding for all file operations.**
+
 > **Execute the mp4towhisper pipeline in YOLO mode.**
 >
 > 1. Run `pwsh/0_Prepare_And_Convert.ps1`.

@@ -3,9 +3,11 @@
 [![PowerShell](https://img.shields.io/badge/PowerShell-7.5+-blue.svg)](https://github.com/PowerShell/PowerShell)
 [![FFmpeg](https://img.shields.io/badge/FFmpeg-required-green.svg)](https://ffmpeg.org/)
 [![Whisper](https://img.shields.io/badge/OpenAI_Whisper-required-orange.svg)](https://github.com/openai/whisper)
+[![OpenCC](https://img.shields.io/badge/OpenCC-S2T_Converter-red.svg)](https://github.com/BYVoid/OpenCC)
 [![uv](https://img.shields.io/badge/uv-package_manager-purple.svg)](https://docs.astral.sh/uv/)
 
 For Windows.
+
 專為解決「Whisper 處理長靜音導致異常循環」所設計的自動化字幕產生工具。
 
 ## How to Start?

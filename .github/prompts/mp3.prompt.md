@@ -17,37 +17,37 @@ agent: agent
 ### 步驟 1：切割音訊（偵測靜音區段）
 
 ```powershell
-.\powershell\1_Split_Audio.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\1_Split_Audio.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ### 步驟 2：Whisper 辨識
 
 ```powershell
-.\powershell\1.5_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\1.5_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ### 步驟 3：合併字幕
 
 ```powershell
-.\powershell\2_Merge_SRT.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\2_Merge_SRT.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ### 步驟 4：簡轉繁 (OpenCC)
 
 ```powershell
-.\powershell\2.2_Convert_S2T.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\2.2_Convert_S2T.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ### 步驟 5：AI 優化字幕（可選）
 
 ```powershell
-.\powershell\2.5_Fix_Error_Words.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\2.5_Fix_Error_Words.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ### 步驟 6：（可選）提取純文字
 
 ```powershell
-.\powershell\3_Extract_Text.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\3_Extract_Text.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ## 使用方式

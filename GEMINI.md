@@ -16,28 +16,28 @@ To run the entire pipeline from start to finish, follow these steps in order.
 
 Convert source MP4 files to MP3.
 
-- **Command**: `powershell -ExecutionPolicy Bypass -File powershell/0_Prepare_And_Convert.ps1`
+- **Command**: `pwsh -ExecutionPolicy Bypass -File pwsh/0_Prepare_And_Convert.ps1`
 - **Check**: Ensure `.mp3` files exist in `file/ori_mp3`.
 
 ### Step 2: Split Audio
 
 Split MP3 files into chunks for processing.
 
-- **Command**: `powershell -ExecutionPolicy Bypass -File powershell/1_Split_Audio.ps1`
+- **Command**: `pwsh -ExecutionPolicy Bypass -File pwsh/1_Split_Audio.ps1`
 - **Check**: Ensure chunk files exist in `file/tmp_mp3`.
 
 ### Step 3: Transcribe (Whisper)
 
 Run OpenAI Whisper on the audio chunks using `uv run`.
 
-- **Command**: `powershell -ExecutionPolicy Bypass -File powershell/1.5_Run_whisper.ps1`
+- **Command**: `pwsh -ExecutionPolicy Bypass -File pwsh/1.5_Run_whisper.ps1`
 - **Check**: Ensure `.srt` files exist in `file/tmp_srt`.
 
 ### Step 4: Merge SRT
 
 Merge the chunked SRT files back into a single sequence.
 
-- **Command**: `powershell -ExecutionPolicy Bypass -File powershell/2_Merge_SRT.ps1`
+- **Command**: `pwsh -ExecutionPolicy Bypass -File pwsh/2_Merge_SRT.ps1`
 - **Check**: Ensure `_merge.srt` files exist in `file/merge_srt`.
 
 ### Step 5: AI Error Correction (Agent Task)
@@ -72,14 +72,14 @@ Merge the chunked SRT files back into a single sequence.
 
 Apply the AI-generated corrections to the SRT files.
 
-- **Command**: `powershell -ExecutionPolicy Bypass -File powershell/2.5_Fix_Error_Words.ps1`
+- **Command**: `pwsh -ExecutionPolicy Bypass -File pwsh/2.5_Fix_Error_Words.ps1`
 - **Check**: Ensure `_ai.srt` files are created and copied to `file/fin_srt`.
 
 ### Step 7: Extract Text (Optional)
 
 Extract pure text from the final SRT.
 
-- **Command**: `powershell -ExecutionPolicy Bypass -File powershell/3_Extract_Text.ps1`
+- **Command**: `pwsh -ExecutionPolicy Bypass -File pwsh/3_Extract_Text.ps1`
 
 ---
 
@@ -93,10 +93,10 @@ Or copy and paste this into your AI CLI to run the full pipeline:
 >
 > **Execute the mp4towhisper pipeline in YOLO mode.**
 >
-> 1. Run `powershell/0_Prepare_And_Convert.ps1`.
-> 2. Run `powershell/1_Split_Audio.ps1`.
-> 3. Run `powershell/1.5_Run_whisper.ps1`.
-> 4. Run `powershell/2_Merge_SRT.ps1`.
+> 1. Run `pwsh/0_Prepare_And_Convert.ps1`.
+> 2. Run `pwsh/1_Split_Audio.ps1`.
+> 3. Run `pwsh/1.5_Run_whisper.ps1`.
+> 4. Run `pwsh/2_Merge_SRT.ps1`.
 > 5. **CRITICAL**: Read all `file/merge_srt/*_merge.srt` files. For each, generate a correction JSON file (same basename, .json extension) containing a list of `mappings` with `correct` and `wrong` (array) fields to fix common speech recognition errors.
-> 6. Run `powershell/2.5_Fix_Error_Words.ps1`.
-> 7. Run `powershell/3_Extract_Text.ps1`.
+> 6. Run `pwsh/2.5_Fix_Error_Words.ps1`.
+> 7. Run `pwsh/3_Extract_Text.ps1`.

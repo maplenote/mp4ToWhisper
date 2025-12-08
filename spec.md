@@ -8,7 +8,7 @@
 **必備工具**：FFmpeg, OpenAI Whisper (Python 版)
 **檔案結構**：
 
-- `powershell/`: 各步驟執行的 ps1 檔
+- `pwsh/`: 各步驟執行的 ps1 檔
 - `file/ori_mp4/`: 原始影片檔
 - `file/ori_mp3/`: 轉換後的 MP3 (或手動放入的 MP3)
 - `file/tmp_mp3/`: 切割後的 MP3 片段
@@ -43,7 +43,7 @@ ffmpeg -version
 `uv --version`
 
 Windows 安裝 uv
-`powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+`pwsh -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
 
 uv 版本更新
 `uv self update`
@@ -128,16 +128,16 @@ Offset 資訊會存入 `file/tmp_csv/{ID}.csv`。
 
 ```powershell
 # 處理全部檔案
-.\powershell\1_Split_Audio.ps1
+.\pwsh\1_Split_Audio.ps1
 
 # 處理指定檔案
-.\powershell\1_Split_Audio.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\1_Split_Audio.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理指定檔案
-.\powershell\1_Split_Audio.ps1 -TargetFileName "my_video.mp3" -Force
+.\pwsh\1_Split_Audio.ps1 -TargetFileName "my_video.mp3" -Force
 ```
 
-腳本存放於 `powershell/1_Split_Audio.ps1`。
+腳本存放於 `pwsh/1_Split_Audio.ps1`。
 
 ```powershell
 # 設定區
@@ -232,16 +232,16 @@ Write-Host "`n切割完成！" -ForegroundColor Green
 
 ```powershell
 # 處理全部檔案
-.\powershell\1.5_Run_whisper.ps1
+.\pwsh\1.5_Run_whisper.ps1
 
 # 處理指定檔案
-.\powershell\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理指定檔案
-.\powershell\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3" -Force
+.\pwsh\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3" -Force
 ```
 
-腳本存放於 `powershell/1.5_Run_whisper.ps1`。
+腳本存放於 `pwsh/1.5_Run_whisper.ps1`。
 
 ```powershell
 # (腳本內容略，請直接執行檔案)
@@ -261,16 +261,16 @@ Write-Host "`n切割完成！" -ForegroundColor Green
 
 ```powershell
 # 處理全部檔案
-.\powershell\2_Merge_SRT.ps1
+.\pwsh\2_Merge_SRT.ps1
 
 # 處理指定檔案
-.\powershell\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理指定檔案
-.\powershell\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3" -Force
+.\pwsh\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3" -Force
 ```
 
-腳本存放於 `powershell/2_Merge_SRT.ps1`。
+腳本存放於 `pwsh/2_Merge_SRT.ps1`。
 
 ```powershell
 # 設定區
@@ -359,7 +359,7 @@ Write-Host "所有作業結束！"
 **範例**：
 
 ```powershell
-.\powershell\2.2_Convert_S2T.ps1
+.\pwsh\2.2_Convert_S2T.ps1
 ```
 
 ## 步驟 4.5：AI 優化辨識錯誤文字 (Phase 4.5)
@@ -400,13 +400,13 @@ file/fin_srt/
 
 ```powershell
 # 處理全部檔案
-.\powershell\2.5_Fix_Error_Words.ps1
+.\pwsh\2.5_Fix_Error_Words.ps1
 
 # 處理指定檔案
-.\powershell\2.5_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\2.5_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理
-.\powershell\2.5_Fix_Error_Words.ps1 -Force
+.\pwsh\2.5_Fix_Error_Words.ps1 -Force
 ```
 
 ### 對照表 JSON 結構
@@ -446,16 +446,16 @@ file/fin_srt/
 
 ```powershell
 # 處理全部檔案
-.\powershell\3_Extract_Text.ps1
+.\pwsh\3_Extract_Text.ps1
 
 # 處理指定檔案
-.\powershell\3_Extract_Text.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\3_Extract_Text.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理指定檔案
-.\powershell\3_Extract_Text.ps1 -TargetFileName "my_video.srt" -Force
+.\pwsh\3_Extract_Text.ps1 -TargetFileName "my_video.srt" -Force
 ```
 
-腳本存放於 `powershell/3_Extract_Text.ps1`。
+腳本存放於 `pwsh/3_Extract_Text.ps1`。
 
 ```powershell
 # (腳本內容略，請直接執行檔案)
@@ -475,22 +475,22 @@ file/fin_srt/
 
 ```powershell
 # 互動式確認後刪除 (移至資源回收筒)
-.\powershell\Clear_File_Dir.ps1
+.\pwsh\Clear_File_Dir.ps1
 
 # 強制刪除
-.\powershell\Clear_File_Dir.ps1 -Force
+.\pwsh\Clear_File_Dir.ps1 -Force
 
 # 模擬刪除
-.\powershell\Clear_File_Dir.ps1 -DryRun
+.\pwsh\Clear_File_Dir.ps1 -DryRun
 ```
 
 ### SOP 總結
 
 1. **環境**：執行 `uv sync` (建立虛擬環境並安裝相依套件)。
-2. **準備**：執行 `.\powershell\0_Prepare_And_Convert.ps1` (建立資料夾、MP4 轉 MP3)。
-3. **切割**：執行 `.\powershell\1_Split_Audio.ps1` (產出 chunk mp3 和 csv)。
-4. **辨識**：執行 `.\powershell\1.5_Run_whisper.ps1` (產出 chunk srt)。
-5. **合併**：執行 `.\powershell\2_Merge_SRT.ps1` (產出 完整 srt)。
-6. **修正**：執行 `.\powershell\2.5_Fix_Error_Words.ps1` (自動修正常見辨識錯誤)。
-7. **轉文**：執行 `.\powershell\3_Extract_Text.ps1` (產出 完整 txt)。
-8. **清理**：執行 `.\powershell\Clear_File_Dir.ps1` (清空暫存檔，保留 models/ 與 .gitkeep)。
+2. **準備**：執行 `.\pwsh\0_Prepare_And_Convert.ps1` (建立資料夾、MP4 轉 MP3)。
+3. **切割**：執行 `.\pwsh\1_Split_Audio.ps1` (產出 chunk mp3 和 csv)。
+4. **辨識**：執行 `.\pwsh\1.5_Run_whisper.ps1` (產出 chunk srt)。
+5. **合併**：執行 `.\pwsh\2_Merge_SRT.ps1` (產出 完整 srt)。
+6. **修正**：執行 `.\pwsh\2.5_Fix_Error_Words.ps1` (自動修正常見辨識錯誤)。
+7. **轉文**：執行 `.\pwsh\3_Extract_Text.ps1` (產出 完整 txt)。
+8. **清理**：執行 `.\pwsh\Clear_File_Dir.ps1` (清空暫存檔，保留 models/ 與 .gitkeep)。

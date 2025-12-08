@@ -12,7 +12,7 @@ For Windows.
 
 1. (第一次) 確認環境有 uv 與 FFmpeg 與 PowerShell 7.5+ (請務必使用 `pwsh` 指令執行)
 2. (第一次) uv sync 安裝相依套件 (預計約 2.5GB，第一次執行轉檔還會下載 Whisper 模型，預計約 1.5GB)
-3. (第 N 次) 若之前已經轉過檔案 (請確保檔案已不需使用，刪除後會移至資源回收筒)，需要清空暫存資料夾，可執行 `.\powershell\Clear_File_Dir.ps1` (只會保留 models/ 與 .gitkeep)
+3. (第 N 次) 若之前已經轉過檔案 (請確保檔案已不需使用，刪除後會移至資源回收筒)，需要清空暫存資料夾，可執行 `.\pwsh\Clear_File_Dir.ps1` (只會保留 models/ 與 .gitkeep)
 4. 將 MP4 放入 `file/ori_mp4/` ，若只有 MP3 可放入 `file/ori_mp3/`
 5. 開啟 vscode 或 gemini cli 
    - vscode 選擇使用 /mp4 或 /mp3 指示轉檔
@@ -31,7 +31,7 @@ For Windows.
 
 ```text
 mp4ToWhisper/
-├── powershell/                 # PowerShell 腳本
+├── pwsh/                       # PowerShell 7.5 腳本
 │   ├── 0_Prepare_And_Convert.ps1  # 建立資料夾、MP4 轉 MP3
 │   ├── 1_Split_Audio.ps1          # 偵測靜音並切割音訊
 │   ├── 1.5_Run_whisper.ps1        # 執行 Whisper 辨識
@@ -79,7 +79,7 @@ mp4ToWhisper/
 #### 2️⃣ 安裝 uv 套件管理器
 
 ```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+pwsh -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 #### 3️⃣ 複製專案並安裝相依套件
@@ -123,37 +123,37 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 將 MP4 影片放入 `file/ori_mp4/`，然後執行：
 
 ```powershell
-.\powershell\0_Prepare_And_Convert.ps1
+.\pwsh\0_Prepare_And_Convert.ps1
 ```
 
 #### 2️⃣ 切割音訊
 
 ```powershell
 # 處理全部
-.\powershell\1_Split_Audio.ps1
+.\pwsh\1_Split_Audio.ps1
 
 # 處理指定檔案
-.\powershell\1_Split_Audio.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\1_Split_Audio.ps1 -TargetFileName "my_video.mp3"
 ```
 
 #### 3️⃣ Whisper 辨識
 
 ```powershell
 # 處理全部
-.\powershell\1.5_Run_whisper.ps1
+.\pwsh\1.5_Run_whisper.ps1
 
 # 處理指定檔案
-.\powershell\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3"
 ```
 
 #### 4️⃣ 合併字幕
 
 ```powershell
 # 處理全部
-.\powershell\2_Merge_SRT.ps1
+.\pwsh\2_Merge_SRT.ps1
 
 # 處理指定檔案
-.\powershell\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
 ```
 
 合併後的字幕會存入 `file/merge_srt/{filename}_merge.srt`。
@@ -164,10 +164,10 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 
 ```powershell
 # 處理全部
-.\powershell\2.2_Convert_S2T.ps1
+.\pwsh\2.2_Convert_S2T.ps1
 
 # 處理指定檔案
-.\powershell\2.2_Convert_S2T.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\2.2_Convert_S2T.ps1 -TargetFileName "my_video.mp3"
 ```
 
 #### 4.5️⃣ AI 優化字幕 (可選)
@@ -181,7 +181,7 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 3. 執行腳本套用修正：
 
 ```powershell
-.\powershell\2.5_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\2.5_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
 ```
 
 輸出結果：
@@ -192,7 +192,7 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 #### 5️⃣ (可選) 提取純文字
 
 ```powershell
-.\powershell\3_Extract_Text.ps1
+.\pwsh\3_Extract_Text.ps1
 ```
 
 #### 6️⃣ (可選) 清空暫存資料夾
@@ -201,13 +201,13 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 
 ```powershell
 # 互動式確認後刪除 (移至資源回收筒)
-.\powershell\Clear_File_Dir.ps1
+.\pwsh\Clear_File_Dir.ps1
 
 # 強制刪除 (不詢問)
-.\powershell\Clear_File_Dir.ps1 -Force
+.\pwsh\Clear_File_Dir.ps1 -Force
 
 # 模擬刪除 (僅列出會被刪除的檔案)
-.\powershell\Clear_File_Dir.ps1 -DryRun
+.\pwsh\Clear_File_Dir.ps1 -DryRun
 ```
 
 ## 📌 參數說明
@@ -223,7 +223,7 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 
 ```powershell
 # 強制重新處理指定檔案
-.\powershell\1_Split_Audio.ps1 -TargetFileName "lecture.mp3" -Force
+.\pwsh\1_Split_Audio.ps1 -TargetFileName "lecture.mp3" -Force
 ```
 
 ## 🤖 Agent Prompt

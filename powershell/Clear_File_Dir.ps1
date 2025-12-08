@@ -3,6 +3,9 @@ param(
     [switch]$DryRun = $false
 )
 
+# 載入 VisualBasic 組件以支援資源回收筒功能
+Add-Type -AssemblyName Microsoft.VisualBasic
+
 # 清理暫存檔案腳本
 $BaseDir = Join-Path $PSScriptRoot ".."
 $FileDir = Join-Path $BaseDir "file"
@@ -18,7 +21,7 @@ Write-Host "將要清理以下目錄的內容：" -ForegroundColor Yellow
 foreach ($t in $Targets) { Write-Host " - $t" -ForegroundColor Gray }
 
 if (-not $Force) {
-    $ans = Read-Host "是否真的要清空所有資料?(將無法復原) [y/N]"
+    $ans = Read-Host "是否真的要清空所有資料?(檔案會移到windows垃圾桶) [y/N]"
     if ($ans -ne 'y' -and $ans -ne 'Y') {
         Write-Host "已取消。未進行任何刪除操作。" -ForegroundColor Cyan
         exit 0
@@ -45,7 +48,9 @@ foreach ($rel in $Targets) {
                     # 保留 .gitkeep
                     return
                 }
-                try { Remove-Item -LiteralPath $_.FullName -Force -ErrorAction Stop } catch { Write-Host "    無法刪除檔案: $($_.FullName) - $_" -ForegroundColor Red }
+                try { 
+                    [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile($_.FullName, 'OnlyErrorDialogs', 'SendToRecycleBin') 
+                } catch { Write-Host "    無法刪除檔案: $($_.FullName) - $_" -ForegroundColor Red }
             }
         }
     }

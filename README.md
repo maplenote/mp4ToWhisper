@@ -5,17 +5,19 @@
 [![Whisper](https://img.shields.io/badge/OpenAI_Whisper-required-orange.svg)](https://github.com/openai/whisper)
 [![uv](https://img.shields.io/badge/uv-package_manager-purple.svg)](https://docs.astral.sh/uv/)
 
+For Windows.
 專為解決「Whisper 處理長靜音導致異常循環」所設計的自動化字幕產生工具。
 
 ## How to Start?
 
-1. 確認環境有 uv 與 FFmpeg 與 PowerShell 7.5+ (請務必使用 `pwsh` 指令執行)
-2. uv sync 安裝相依套件 (預計約 2.5GB，第一次執行轉檔還會下載 Whisper 模型，預計約 1.5GB)
-3. 將 MP4 放入 `file/ori_mp4/` ，若只有 MP3 可放入 `file/ori_mp3/`
-4. 開啟 vscode 或 gemini cli 
+1. (第一次) 確認環境有 uv 與 FFmpeg 與 PowerShell 7.5+ (請務必使用 `pwsh` 指令執行)
+2. (第一次) uv sync 安裝相依套件 (預計約 2.5GB，第一次執行轉檔還會下載 Whisper 模型，預計約 1.5GB)
+3. (第 N 次) 若之前已經轉過檔案 (請確保檔案已不需使用，刪除後會移至資源回收筒)，需要清空暫存資料夾，可執行 `.\powershell\Clear_File_Dir.ps1` (只會保留 models/ 與 .gitkeep)
+4. 將 MP4 放入 `file/ori_mp4/` ，若只有 MP3 可放入 `file/ori_mp3/`
+5. 開啟 vscode 或 gemini cli 
    - vscode 選擇使用 /mp4 或 /mp3 指示轉檔
    - gemini cli 使用 @YOLO_PROMPT.md 或 @SAFE_MODE_PROMPT.md 指示轉檔
-5. 等待轉檔完成，最終字幕會放在 `file/fin_srt/`
+6. 等待轉檔完成，最終字幕會放在 `file/fin_srt/`，將 .srt 檔案放到 .mp4 相同資料夾下，用 VLC player 直接撥放 mp4 檔案就會自動載入字幕。若需要文字優化過程與比較檔案，請參閱 `file/merge_srt/`，_merge.srt 為合併後字幕，_ai.srt 為 AI 優化後字幕。
 
 ## 🎯 核心功能
 
@@ -198,7 +200,7 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 當專案執行完畢，可使用此腳本清空 `file/` 下除了 `models` 以外的所有資料夾內容 (會保留 `.gitkeep`)。
 
 ```powershell
-# 互動式確認後刪除
+# 互動式確認後刪除 (移至資源回收筒)
 .\powershell\Clear_File_Dir.ps1
 
 # 強制刪除 (不詢問)

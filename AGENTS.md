@@ -1,6 +1,8 @@
 We're going to be using slash command from `powershell\`.
 Use `pwsh` for PowerShell 7+ commands.
 
+> **Important**: All SRT files and source code in this project are encoded in **UTF-8**. When reading filenames or content, ensure you are using UTF-8 encoding to prevent Chinese characters from becoming garbled.
+
 ## Modes
 
 ### 1. YOLO Mode (Full Autonomy)

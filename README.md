@@ -9,7 +9,7 @@
 
 ## How to Start?
 
-1. 確認環境有 uv 與 FFmpeg 與 PowerShell 7.5+
+1. 確認環境有 uv 與 FFmpeg 與 PowerShell 7.5+ (請務必使用 `pwsh` 指令執行)
 2. uv sync 安裝相依套件 (預計約 2.5GB，第一次執行轉檔還會下載 Whisper 模型，預計約 1.5GB)
 3. 將 MP4 放入 `file/ori_mp4/` ，若只有 MP3 可放入 `file/ori_mp3/`
 4. 開啟 vscode 或 gemini cli 
@@ -171,6 +171,8 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 #### 4.5️⃣ AI 優化字幕 (可選)
 
 使用 AI Agent 根據主題產生專用的錯誤對照表，並套用修正：
+
+> **注意**：本專案所有 SRT 檔案與程式碼皆採用 **UTF-8** 編碼。AI 在讀取檔案內容或檔名時，請確保使用 UTF-8 格式，避免中文出現亂碼。
 
 1. 使用 `.github/prompts/fixErrorWords.prompt.md` 提示 AI
 2. AI 產生 `file/merge_srt/{filename}.json` 對照表

@@ -5,6 +5,8 @@ Execute the following steps in order. If a step fails, stop and report the error
 
 ## Phase 1: Audio Processing
 
+> **Note**: Use `pwsh` for all PowerShell commands.
+
 1. **Prepare & Convert**
    - Command: `powershell -ExecutionPolicy Bypass -File powershell/0_Prepare_And_Convert.ps1`
    - Goal: Convert MP4s in `file/ori_mp4` to MP3s in `file/ori_mp3`.
@@ -26,6 +28,8 @@ Execute the following steps in order. If a step fails, stop and report the error
    - Goal: Convert Simplified Chinese to Traditional Chinese.
 
 ## Phase 2: AI Analysis & Correction (Your Core Task)
+
+> **Important**: All SRT files are **UTF-8** encoded. Ensure you read them as UTF-8 to avoid garbled Chinese characters.
 
 6. **Generate Correction JSONs**
    - **Input**: Read all files in `file/merge_srt/` ending with `_merge.srt`.

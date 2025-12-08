@@ -4,7 +4,7 @@
 此流程利用 PowerShell 7.5 與 FFmpeg 自動化處理「偵測靜音 → 切割 → 辨識 → 合併 → 轉純文字」的所有步驟。
 
 **核心目標**：避免 Whisper 因長靜音 (\>=8 秒) 產生幻覺或重複，確保時間軸精準。
-**適用環境**：Windows 11 / PowerShell 7.5
+**適用環境**：Windows 11 / PowerShell 7.5 (請務必使用 `pwsh` 指令執行)
 **必備工具**：FFmpeg, OpenAI Whisper (Python 版)
 **檔案結構**：
 
@@ -365,6 +365,8 @@ Write-Host "所有作業結束！"
 ## 步驟 4.5：AI 優化辨識錯誤文字 (Phase 4.5)
 
 此步驟由 AI Agent 根據當次辨識的主題，分析 `file/merge_srt/` 內的 `_merge.srt` 字幕檔，產生專用的錯誤對照表並套用修正。
+
+> **注意**：本專案所有 SRT 檔案與程式碼皆採用 **UTF-8** 編碼。AI 在讀取檔案內容或檔名時，請確保使用 UTF-8 格式，避免中文出現亂碼。
 
 ### 檔案命名規則
 

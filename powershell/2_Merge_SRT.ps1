@@ -56,7 +56,7 @@ $FilesToProcess | ForEach-Object {
     }
 
     # 4. 執行合併
-    $Offsets = Import-Csv $CsvPath
+    $Offsets = Import-Csv $CsvPath -Encoding UTF8
     $GlobalCounter = 1
     
     # 清除舊檔 (如果是 Force 模式)
@@ -72,7 +72,7 @@ $FilesToProcess | ForEach-Object {
             continue 
         }
 
-        $Content = Get-Content $ChunkSrtPath
+        $Content = Get-Content $ChunkSrtPath -Encoding UTF8
         $TimeSpanOffset = [TimeSpan]::FromSeconds($TimeOffset)
 
         foreach ($Line in $Content) {
@@ -83,14 +83,14 @@ $FilesToProcess | ForEach-Object {
                 $NewStart = $StartT.Add($TimeSpanOffset).ToString('hh\:mm\:ss\,fff')
                 $NewEnd   = $EndT.Add($TimeSpanOffset).ToString('hh\:mm\:ss\,fff')
 
-                "$NewStart --> $NewEnd" | Add-Content $OutputFile
+                "$NewStart --> $NewEnd" | Add-Content $OutputFile -Encoding UTF8
             }
             elseif ($Line -match '^\d+$') {
-                "$GlobalCounter" | Add-Content $OutputFile
+                "$GlobalCounter" | Add-Content $OutputFile -Encoding UTF8
                 $GlobalCounter++
             }
             else {
-                $Line | Add-Content $OutputFile
+                $Line | Add-Content $OutputFile -Encoding UTF8
             }
         }
     }

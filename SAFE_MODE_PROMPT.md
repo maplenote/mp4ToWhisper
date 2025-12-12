@@ -22,7 +22,9 @@ Execute the following steps in order.
 2. **Split Audio**
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/1_Split_Audio.ps1`
 3. **Transcribe (Whisper)**
+   - **Pre-check**: Ask user if they want to use `openai` (default) or `ctranslate2` engine, and if they have an `InitialPrompt`.
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/1.5_Run_whisper.ps1`
+   - *Optional Args*: `-Engine ctranslate2`, `-UseVAD`, `-InitialPrompt "context"`
 4. **Merge SRT**
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/2_Merge_SRT.ps1`
 5. **Convert S2T**

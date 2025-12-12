@@ -16,8 +16,10 @@ Execute the following steps in order. If a step fails, stop and report the error
    - Goal: Split MP3s into chunks in `file/tmp_mp3`.
 
 3. **Transcribe (Whisper)**
+   - **Pre-check**: Ask user for preferred engine (`openai` or `ctranslate2`) and any `InitialPrompt`.
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/1.5_Run_whisper.ps1`
-   - Goal: Transcribe chunks to SRT files in `file/tmp_srt` using `uv run whisper`.
+   - *Optional Args*: `-Engine ctranslate2`, `-UseVAD`, `-InitialPrompt "context"`
+   - Goal: Transcribe chunks to SRT files in `file/tmp_srt` using `uv run whisper` or `whisper-ctranslate2`.
 
 4. **Merge SRT**
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/2_Merge_SRT.ps1`
@@ -34,7 +36,7 @@ Execute the following steps in order. If a step fails, stop and report the error
 6. **Generate Correction JSONs**
    - **Input**: Read all files in `file/merge_srt/` ending with `_merge.srt`.
 
-   - **Task**: For _each_ file, analyze the text for OCR/ASR errors (wrong homophones, broken technical terms).
+   - **Task**: For *each* file, analyze the text for OCR/ASR errors (wrong homophones, broken technical terms).
 
    - **Output**: Create a JSON file in `file/merge_srt/` with the same basename (e.g., `video01.json` for `video01_merge.srt`).
 
@@ -49,7 +51,7 @@ Execute the following steps in order. If a step fails, stop and report the error
      }
      ```
 
-   - _Note: Do not edit the SRT files directly. Only create the JSON files._
+   - *Note: Do not edit the SRT files directly. Only create the JSON files.*
 
 ## Phase 3: Finalization
 

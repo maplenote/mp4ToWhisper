@@ -7,6 +7,7 @@ requires-python = ">=3.11,<3.13"
 dependencies = [
     "openai-whisper>=20250625",
     "opencc-python-reimplemented>=0.1.7",
+    "whisper-ctranslate2>=0.5.0",
 ]
 
 [tool.uv]

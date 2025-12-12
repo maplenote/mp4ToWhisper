@@ -1,6 +1,9 @@
 param (
     [string]$TargetFileName = $null,
     [string]$Model = "medium",
+    [string]$Engine = $null,
+    [string]$InitialPrompt = $null,
+    [switch]$UseVAD = $false,
     [switch]$Force = $false
 )
 
@@ -10,6 +13,48 @@ $OriMp3Dir = Join-Path $BaseDir "file/ori_mp3"
 $TmpMp3Dir = Join-Path $BaseDir "file/tmp_mp3"
 $TmpSrtDir = Join-Path $BaseDir "file/tmp_srt"
 $ModelsDir = Join-Path $BaseDir "file/models"
+$EnvFile = Join-Path $BaseDir ".env"
+
+# 讀取 .env 設定
+if (Test-Path $EnvFile) {
+    Get-Content $EnvFile | ForEach-Object {
+        if ($_ -match "^\s*([^#=]+)\s*=\s*(.*)\s*$") {
+            $Name = $matches[1]
+            $Value = $matches[2]
+            Set-Variable -Name "ENV_$Name" -Value $Value -Scope Local
+        }
+    }
+}
+
+# 決定使用的 Engine
+# 優先順序: 參數 > 環境變數 > 預設值(openai)
+$Source = "Default"
+if ($Engine) {
+    $Source = "Parameter"
+} elseif ($ENV_WHISPER_ENGINE) {
+    $Engine = $ENV_WHISPER_ENGINE
+    $Source = "Environment (.env)"
+} else {
+    $Engine = "openai"
+}
+
+# 驗證 Engine
+if ($Engine -notin @("openai", "ctranslate2")) {
+    Write-Warning "偵測到無效的 Engine 設定: '$Engine' (來源: $Source)。將自動切換為預設值 'openai'。"
+    $Engine = "openai"
+}
+
+Write-Host "使用 Whisper Engine: $Engine" -ForegroundColor Cyan
+if ($InitialPrompt) {
+    Write-Host "使用 Initial Prompt: $InitialPrompt" -ForegroundColor Cyan
+}
+if ($UseVAD) {
+    if ($Engine -eq "ctranslate2") {
+        Write-Host "啟用 VAD (Voice Activity Detection)" -ForegroundColor Cyan
+    } else {
+        Write-Warning "VAD 參數僅支援 ctranslate2 引擎，目前使用 openai 引擎，將忽略此參數。"
+    }
+}
 
 # 確保輸出目錄存在
 if (-not (Test-Path $TmpSrtDir)) {
@@ -73,22 +118,50 @@ foreach ($File in $Mp3Files) {
     Write-Host "正在轉錄: $($File.Name)..." -ForegroundColor Yellow
     
     # 使用 uv run 執行 whisper
-    # 注意: 需確保專案環境已安裝 openai-whisper
+    # 注意: 需確保專案環境已安裝 openai-whisper 或 whisper-ctranslate2
     # --model_dir 指定模型下載/讀取位置
     
     $Command = "uv"
-    $ArgsList = @(
-        "run", 
-        "whisper", 
-        $File.FullName, 
-        "--model", $Model, 
-        "--language", "Chinese",
-        "--device", "cuda",
-        "--output_dir", $TmpSrtDir, 
-        "--output_format", "srt",
-        "--model_dir", $ModelsDir,
-        "--verbose", "False"
-    )
+    $ArgsList = @()
+
+    if ($Engine -eq "ctranslate2") {
+        $ArgsList = @(
+            "run", 
+            "whisper-ctranslate2", 
+            $File.FullName, 
+            "--model", $Model, 
+            "--language", "Chinese",
+            "--device", "cuda",
+            "--output_dir", $TmpSrtDir, 
+            "--output_format", "srt",
+            "--model_dir", $ModelsDir
+            # whisper-ctranslate2 可能不支援 --verbose False，故省略
+        )
+        
+        if ($UseVAD) {
+            $ArgsList += "--vad_filter"
+            $ArgsList += "True"
+        }
+    } else {
+        # openai
+        $ArgsList = @(
+            "run", 
+            "whisper", 
+            $File.FullName, 
+            "--model", $Model, 
+            "--language", "Chinese",
+            "--device", "cuda",
+            "--output_dir", $TmpSrtDir, 
+            "--output_format", "srt",
+            "--model_dir", $ModelsDir,
+            "--verbose", "False"
+        )
+    }
+
+    if ($InitialPrompt) {
+        $ArgsList += "--initial_prompt"
+        $ArgsList += $InitialPrompt
+    }
 
     # 執行指令
     & $Command $ArgsList

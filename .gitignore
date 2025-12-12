@@ -31,3 +31,6 @@ file/tmp/*
 # Whisper models (large binary files ~1.4GB)
 file/models/*
 !file/models/.gitkeep
+
+# Environment variables
+.env

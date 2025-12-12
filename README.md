@@ -3,6 +3,7 @@
 [![PowerShell](https://img.shields.io/badge/PowerShell-7.5+-blue.svg)](https://github.com/PowerShell/PowerShell)
 [![FFmpeg](https://img.shields.io/badge/FFmpeg-required-green.svg)](https://ffmpeg.org/)
 [![Whisper](https://img.shields.io/badge/OpenAI_Whisper-required-orange.svg)](https://github.com/openai/whisper)
+[![Whisper-CTranslate2](https://img.shields.io/badge/Whisper_CTranslate2-optional-orange.svg)](https://github.com/Softcatala/whisper-ctranslate2)
 [![OpenCC](https://img.shields.io/badge/OpenCC-S2T_Converter-red.svg)](https://github.com/BYVoid/OpenCC)
 [![uv](https://img.shields.io/badge/uv-package_manager-purple.svg)](https://docs.astral.sh/uv/)
 
@@ -10,16 +11,19 @@ For Windows.
 
 專為解決「Whisper 處理長靜音導致異常循環」所設計的自動化字幕產生工具。
 
+若有 VAD (Voice Activity Detection) 功能，則可以省去切割長靜音的步驟。
+
 ## How to Start?
 
 1. (第一次) 確認環境有 uv 與 FFmpeg 與 PowerShell 7.5+ (請務必使用 `pwsh` 指令執行)
-2. (第一次) uv sync 安裝相依套件 (預計約 2.5GB，第一次執行轉檔還會下載 Whisper 模型，預計約 1.5GB)
-3. (第 N 次) 若之前已經轉過檔案 (請確保檔案已不需使用，刪除後會移至資源回收筒)，需要清空暫存資料夾，可執行 `.\pwsh\Clear_File_Dir.ps1` (只會保留 models/ 與 .gitkeep)
-4. 將 MP4 放入 `file/ori_mp4/` ，若只有 MP3 可放入 `file/ori_mp3/`
-5. 開啟 vscode 或 gemini cli 
+2. (第一次) 複製 `.env.example` 為 `.env` 並設定 `WHISPER_ENGINE` (預設 openai)，若無此檔案或設定錯誤將自動使用 openai。
+3. (第一次) uv sync 安裝相依套件 (預計約 2.5GB，第一次執行轉檔還會下載 Whisper 模型，預計約 1.5GB)
+4. (第 N 次) 若之前已經轉過檔案 (請確保檔案已不需使用，刪除後會移至資源回收筒)，需要清空暫存資料夾，可執行 `.\pwsh\Clear_File_Dir.ps1` (只會保留 file/models/*、file/**/.gitkeep 與 file/tmp/test.mp3)
+5. 將 MP4 放入 `file/ori_mp4/` ，若只有 MP3 可放入 `file/ori_mp3/`
+6. 開啟 vscode 或 gemini cli 
    - vscode 選擇使用 /mp4 或 /mp3 指示轉檔
    - gemini cli 使用 @YOLO_PROMPT.md 或 @SAFE_MODE_PROMPT.md 指示轉檔
-6. 等待轉檔完成，最終字幕會放在 `file/fin_srt/`，將 .srt 檔案放到 .mp4 相同資料夾下，用 VLC player 直接撥放 mp4 檔案就會自動載入字幕。若需要文字優化過程與比較檔案，請參閱 `file/merge_srt/`，_merge.srt 為合併後字幕，_ai.srt 為 AI 優化後字幕。
+7. 等待轉檔完成，最終字幕會放在 `file/fin_srt/`，將 .srt 檔案放到 .mp4 相同資料夾下，用 VLC player 直接撥放 mp4 檔案就會自動載入字幕。若需要文字優化過程與比較檔案，請參閱 `file/merge_srt/`，_merge.srt 為合併後字幕，_ai.srt 為 AI 優化後字幕。
 
 ## 🎯 核心功能
 
@@ -96,20 +100,33 @@ uv sync
 
 **注意**：首次執行會下載約 2.5GB 的 PyTorch 相依套件，請確保網路暢通。
 
+#### 3.5️⃣ (可選) 設定預設引擎
+
+複製 `.env.example` 為 `.env`，可設定預設使用的 Whisper 引擎 (openai 或 ctranslate2)。
+
 #### 4️⃣ 下載 Whisper 模型
 
 首次執行辨識時會自動下載，或可手動預先下載：
 
 ```powershell
+# 下載 OpenAI Whisper 模型 (預設)
 uv run whisper --model medium --model_dir "file/models" --help
+
+# 下載 Whisper CTranslate2 模型 (若使用 ctranslate2 引擎)
+# 注意: 執行轉檔時會自動下載，此處僅為手動預載範例
+uv run whisper-ctranslate2 --model medium --model_dir "file/models" --help
 ```
 
-模型約 1.5GB，存放在 `file/models/` 目錄中，不會被系統暫存清理刪除。
+openai/whisper 模型約 1.5GB (medium.pt)，whisper-ctranslate2 模型也約 1.5GB (models--Systran--faster-whisper-medium/)，兩者並不共用模型，皆存放在 `file/models/` 目錄中，不會被系統暫存清理刪除。
 
 #### 5️⃣ 測試 Whisper 是否正常運作
 
 ```powershell
+# 測試 OpenAI Whisper
 uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "file/models" --language Chinese --output_format srt --output_dir "file/tmp"
+
+# 測試 Whisper CTranslate2
+uv run whisper-ctranslate2 "file/tmp/test.mp3" --model medium --device cuda --model_dir "file/models" --language Chinese --output_format srt --output_dir "file/tmp"
 ```
 
 執行後會在終端機直接顯示辨識後的內容 (輸出檔案會在 `file/tmp/test.srt`)：
@@ -141,8 +158,17 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 #### 3️⃣ Whisper 辨識
 
 ```powershell
-# 處理全部
+# 處理全部 (預設使用 openai)
 .\pwsh\1.5_Run_whisper.ps1
+
+# 使用 CTranslate2 加速引擎
+.\pwsh\1.5_Run_whisper.ps1 -Engine ctranslate2
+
+# 啟用 VAD 過濾 (僅限 ctranslate2)
+.\pwsh\1.5_Run_whisper.ps1 -Engine ctranslate2 -UseVAD
+
+# 加入提示詞 (Context) 以提升準確度
+.\pwsh\1.5_Run_whisper.ps1 -InitialPrompt "這是一段關於量子力學的演講，包含許多物理專有名詞。"
 
 # 處理指定檔案
 .\pwsh\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3"
@@ -211,6 +237,10 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 # 模擬刪除 (僅列出會被刪除的檔案)
 .\pwsh\Clear_File_Dir.ps1 -DryRun
 ```
+
+| `-Engine`                   | 指定 Whisper 引擎 (`openai` 或 `ctranslate2`) |
+| `-InitialPrompt`            | 提供給 AI 的提示詞 (Context)，有助於專有名詞辨識 |
+| `-UseVAD`                   | 啟用 VAD 語音活動偵測 (僅限 `ctranslate2`) |
 
 ## 📌 參數說明
 

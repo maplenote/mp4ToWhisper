@@ -44,8 +44,8 @@ foreach ($rel in $Targets) {
                 # 不刪除資料夾本身，以保留 .gitkeep 或目錄結構
                 return
             } else {
-                if ($_.Name -ieq '.gitkeep') {
-                    # 保留 .gitkeep
+                if ($_.Name -ieq '.gitkeep' -or $_.Name -ieq 'test.mp3') {
+                    # 保留 .gitkeep 與 test.mp3
                     return
                 }
                 try { 
@@ -56,15 +56,15 @@ foreach ($rel in $Targets) {
     }
 
     if ($DryRun) {
-        Write-Host "[DryRun] 下列項目會被刪除（保留 .gitkeep）： $path" -ForegroundColor Yellow
-        Get-ChildItem -Path $path -Recurse -Force | Where-Object { -not ($_.PSIsContainer) -and ($_.Name -ine '.gitkeep') } | ForEach-Object { Write-Host "  -> $($_.FullName)" -ForegroundColor Gray }
+        Write-Host "[DryRun] 下列項目會被刪除（保留 .gitkeep 與 test.mp3）： $path" -ForegroundColor Yellow
+        Get-ChildItem -Path $path -Recurse -Force | Where-Object { -not ($_.PSIsContainer) -and ($_.Name -ine '.gitkeep') -and ($_.Name -ine 'test.mp3') } | ForEach-Object { Write-Host "  -> $($_.FullName)" -ForegroundColor Gray }
         continue
     }
 
     try {
-        Write-Host "清除目錄內容（保留 .gitkeep）： $path" -ForegroundColor Yellow
+        Write-Host "清除目錄內容（保留 .gitkeep 與 test.mp3）： $path" -ForegroundColor Yellow
         Clear-PathPreserveGitkeep $path
-        Write-Host "  已清空（保留 .gitkeep）： $rel" -ForegroundColor Green
+        Write-Host "  已清空（保留 .gitkeep 與 test.mp3）： $rel" -ForegroundColor Green
     } catch {
         Write-Host "  無法清除 ${rel}: $($_)" -ForegroundColor Red
     }

@@ -92,8 +92,8 @@ file/fin_srt/
 
 ```powershell
 # 處理全部檔案
-.\pwsh\2.5_Fix_Error_Words.ps1
+.\pwsh\6_Fix_Error_Words.ps1
 
 # 處理指定檔案
-.\pwsh\2.5_Fix_Error_Words.ps1 -TargetFileName "我的影片.mp3"
+.\pwsh\6_Fix_Error_Words.ps1 -TargetFileName "我的影片.mp3"
 ```

@@ -27,50 +27,50 @@ agent: agent
 ### 步驟 1：轉換 MP4 為 MP3
 
 ```powershell
-.\pwsh\0_Prepare_And_Convert.ps1
+.\pwsh\1_Prepare_And_Convert.ps1
 ```
 
 ### 步驟 2：切割音訊（偵測靜音區段）
 
 ```powershell
-.\pwsh\1_Split_Audio.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\2_Split_Audio.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ### 步驟 3：Whisper 辨識
 
 ```powershell
 # 基本指令 (預設 openai)
-.\pwsh\1.5_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\3_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 
 # 若使用 ctranslate2 (範例)
-# .\pwsh\1.5_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3" -Engine ctranslate2 -UseVAD
+# .\pwsh\3_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3" -Engine ctranslate2 -UseVAD
 
 # 若有提示詞 (範例)
-# .\pwsh\1.5_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3" -InitialPrompt "這是一段演講"
+# .\pwsh\3_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3" -InitialPrompt "這是一段演講"
 ```
 
 ### 步驟 4：合併字幕
 
 ```powershell
-.\pwsh\2_Merge_SRT.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\4_Merge_SRT.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ### 步驟 5：簡轉繁 (OpenCC)
 
 ```powershell
-.\pwsh\2.2_Convert_S2T.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\5_Convert_S2T.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ### 步驟 6：AI 優化字幕（可選）
 
 ```powershell
-.\pwsh\2.5_Fix_Error_Words.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\6_Fix_Error_Words.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ### 步驟 7：（可選）提取純文字
 
 ```powershell
-.\pwsh\3_Extract_Text.ps1 -TargetFileName "{{檔案名稱}}.mp3"
+.\pwsh\7_Extract_Text.ps1 -TargetFileName "{{檔案名稱}}.mp3"
 ```
 
 ## 使用方式

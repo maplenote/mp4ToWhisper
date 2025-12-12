@@ -38,12 +38,13 @@ For Windows.
 ```text
 mp4ToWhisper/
 ├── pwsh/                       # PowerShell 7.5 腳本
-│   ├── 0_Prepare_And_Convert.ps1  # 建立資料夾、MP4 轉 MP3
-│   ├── 1_Split_Audio.ps1          # 偵測靜音並切割音訊
-│   ├── 1.5_Run_whisper.ps1        # 執行 Whisper 辨識
-│   ├── 2_Merge_SRT.ps1            # 合併字幕並校正時間軸
-│   ├── 2.5_Fix_Error_Words.ps1    # 套用 AI 對照表修正字幕
-│   ├── 3_Extract_Text.ps1         # 提取純文字逐字稿
+│   ├── 1_Prepare_And_Convert.ps1  # 建立資料夾、MP4 轉 MP3
+│   ├── 2_Split_Audio.ps1          # 偵測靜音並切割音訊
+│   ├── 3_Run_whisper.ps1          # 執行 Whisper 辨識
+│   ├── 4_Merge_SRT.ps1            # 合併字幕並校正時間軸
+│   ├── 5_Convert_S2T.ps1          # 簡轉繁 (OpenCC)
+│   ├── 6_Fix_Error_Words.ps1      # 套用 AI 對照表修正字幕
+│   ├── 7_Extract_Text.ps1         # 提取純文字逐字稿
 │   └── Clear_File_Dir.ps1         # 清空暫存資料夾 (保留 models 與 .gitkeep)
 ├── file/
 │   ├── ori_mp4/               # 原始影片檔
@@ -142,46 +143,46 @@ uv run whisper-ctranslate2 "file/tmp/test.mp3" --model medium --device cuda --mo
 將 MP4 影片放入 `file/ori_mp4/`，然後執行：
 
 ```powershell
-.\pwsh\0_Prepare_And_Convert.ps1
+.\pwsh\1_Prepare_And_Convert.ps1
 ```
 
 #### 2️⃣ 切割音訊
 
 ```powershell
 # 處理全部
-.\pwsh\1_Split_Audio.ps1
+.\pwsh\2_Split_Audio.ps1
 
 # 處理指定檔案
-.\pwsh\1_Split_Audio.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\2_Split_Audio.ps1 -TargetFileName "my_video.mp3"
 ```
 
 #### 3️⃣ Whisper 辨識
 
 ```powershell
 # 處理全部 (預設使用 openai)
-.\pwsh\1.5_Run_whisper.ps1
+.\pwsh\3_Run_whisper.ps1
 
 # 使用 CTranslate2 加速引擎
-.\pwsh\1.5_Run_whisper.ps1 -Engine ctranslate2
+.\pwsh\3_Run_whisper.ps1 -Engine ctranslate2
 
 # 啟用 VAD 過濾 (僅限 ctranslate2)
-.\pwsh\1.5_Run_whisper.ps1 -Engine ctranslate2 -UseVAD
+.\pwsh\3_Run_whisper.ps1 -Engine ctranslate2 -UseVAD
 
 # 加入提示詞 (Context) 以提升準確度
-.\pwsh\1.5_Run_whisper.ps1 -InitialPrompt "這是一段關於量子力學的演講，包含許多物理專有名詞。"
+.\pwsh\3_Run_whisper.ps1 -InitialPrompt "這是一段關於量子力學的演講，包含許多物理專有名詞。"
 
 # 處理指定檔案
-.\pwsh\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\3_Run_whisper.ps1 -TargetFileName "my_video.mp3"
 ```
 
 #### 4️⃣ 合併字幕
 
 ```powershell
 # 處理全部
-.\pwsh\2_Merge_SRT.ps1
+.\pwsh\4_Merge_SRT.ps1
 
 # 處理指定檔案
-.\pwsh\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\4_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
 ```
 
 合併後的字幕會存入 `file/merge_srt/{filename}_merge.srt`。
@@ -192,10 +193,10 @@ uv run whisper-ctranslate2 "file/tmp/test.mp3" --model medium --device cuda --mo
 
 ```powershell
 # 處理全部
-.\pwsh\2.2_Convert_S2T.ps1
+.\pwsh\5_Convert_S2T.ps1
 
 # 處理指定檔案
-.\pwsh\2.2_Convert_S2T.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\5_Convert_S2T.ps1 -TargetFileName "my_video.mp3"
 ```
 
 #### 4.5️⃣ AI 優化字幕 (可選)
@@ -209,7 +210,7 @@ uv run whisper-ctranslate2 "file/tmp/test.mp3" --model medium --device cuda --mo
 3. 執行腳本套用修正：
 
 ```powershell
-.\pwsh\2.5_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\6_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
 ```
 
 輸出結果：
@@ -220,7 +221,7 @@ uv run whisper-ctranslate2 "file/tmp/test.mp3" --model medium --device cuda --mo
 #### 5️⃣ (可選) 提取純文字
 
 ```powershell
-.\pwsh\3_Extract_Text.ps1
+.\pwsh\7_Extract_Text.ps1
 ```
 
 #### 6️⃣ (可選) 清空暫存資料夾
@@ -244,7 +245,7 @@ uv run whisper-ctranslate2 "file/tmp/test.mp3" --model medium --device cuda --mo
 
 ## 📌 參數說明
 
-所有腳本 (1\~3) 都支援以下參數：
+所有腳本 (2~7) 都支援以下參數：
 
 | 參數                          | 說明                 |
 | --------------------------- | ------------------ |
@@ -255,7 +256,7 @@ uv run whisper-ctranslate2 "file/tmp/test.mp3" --model medium --device cuda --mo
 
 ```powershell
 # 強制重新處理指定檔案
-.\pwsh\1_Split_Audio.ps1 -TargetFileName "lecture.mp3" -Force
+.\pwsh\2_Split_Audio.ps1 -TargetFileName "lecture.mp3" -Force
 ```
 
 ## 🤖 Agent Prompt
@@ -284,7 +285,7 @@ uv run whisper-ctranslate2 "file/tmp/test.mp3" --model medium --device cuda --mo
 - **閾值時間**：8 秒 (超過此時間的靜音會被視為切割點)
 - **分貝閾值**：-50 dB (低於此音量視為靜音)
 
-這些參數可在 `1_Split_Audio.ps1` 中調整。
+這些參數可在 `2_Split_Audio.ps1` 中調整。
 
 ## 📝 License
 

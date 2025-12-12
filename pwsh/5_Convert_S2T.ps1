@@ -1,4 +1,4 @@
-# 2.2_Convert_S2T.ps1
+# 5_Convert_S2T.ps1
 # 使用 OpenCC 將合併後的簡體字幕轉換為繁體中文 (台灣正體)
 # 
 # 工作流程：
@@ -63,7 +63,7 @@ foreach ($MergeFile in $MergeFiles) {
     Write-Host "處理中: $($MergeFile.Name)" -ForegroundColor Yellow
     
     # 執行 Python 腳本進行轉換
-    # 直接覆蓋原檔案，這樣後續的 2.5_Fix_Error_Words.ps1 就能直接讀到繁體內容
+    # 直接覆蓋原檔案，這樣後續的 6_Fix_Error_Words.ps1 就能直接讀到繁體內容
     $ProcessInfo = Start-Process -FilePath $VenvPython -ArgumentList "`"$PythonScript`"", "`"$($MergeFile.FullName)`"" -NoNewWindow -Wait -PassThru
     
     if ($ProcessInfo.ExitCode -eq 0) {

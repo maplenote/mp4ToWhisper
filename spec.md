@@ -5,7 +5,7 @@
 
 **核心目標**：避免 Whisper 因長靜音 (\>=8 秒) 產生幻覺或重複，確保時間軸精準。
 **適用環境**：Windows 11 / PowerShell 7.5 (請務必使用 `pwsh` 指令執行)
-**必備工具**：FFmpeg, OpenAI Whisper (Python 版)
+**必備工具**：FFmpeg, OpenAI Whisper (Python 版) 或 Whisper CTranslate2
 **檔案結構**：
 
 - `pwsh/`: 各步驟執行的 ps1 檔
@@ -63,15 +63,23 @@ uv sync
 首次執行辨識時會自動下載模型，或可手動預先下載：
 
 ```powershell
+# 下載 OpenAI Whisper 模型 (預設)
 uv run whisper --model medium --model_dir "file/models" --help
+
+# 下載 Whisper CTranslate2 模型 (若使用 ctranslate2 引擎)
+uv run whisper-ctranslate2 --model medium --model_dir "file/models" --help
 ```
 
-模型存放在 `file/models/` 目錄中 (約 1.5GB)，不會被系統暫存清理刪除。
+模型存放在 `file/models/` 目錄中 (OpenAI 約 1.5GB, CTranslate2 約 1.5GB)，不會被系統暫存清理刪除。
 
 ### 測試 Whisper 是否正常運作
 
 ```powershell
+# 測試 OpenAI Whisper
 uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "file/models" --language Chinese --output_format srt --output_dir "file/tmp"
+
+# 測試 Whisper CTranslate2
+uv run whisper-ctranslate2 "file/tmp/test.mp3" --model medium --device cuda --model_dir "file/models" --language Chinese --output_format srt --output_dir "file/tmp"
 ```
 
 執行後會在終端機直接顯示辨識後的內容 (輸出檔案會在 `file/tmp/test.srt`)：
@@ -91,27 +99,7 @@ uv run whisper "file/tmp/test.mp3" --model medium --device cuda --model_dir "fil
 此步驟會自動建立所需資料夾，並將 `file/ori_mp4/` 內的影片轉換為 MP3 放入 `file/ori_mp3/`。
 若您有錄影失敗的檔案，請手動轉成 MP3 後直接放入 `file/ori_mp3/`。
 
-請將以下腳本存為 `0_Prepare_And_Convert.ps1` 並執行。
-
-```powershell
-# 設定區
-$Folders = @("file/ori_mp4", "file/ori_mp3", "file/tmp_mp3", "file/tmp_csv", "file/tmp_srt", "file/fin_srt")
-foreach ($f in $Folders) { if (!(Test-Path $f)) { New-Item -ItemType Directory -Path $f -Force | Out-Null } }
-
-$OriMp4Dir = "file/ori_mp4"
-$OriMp3Dir = "file/ori_mp3"
-
-# 轉換 MP4 -> MP3
-Get-ChildItem "$OriMp4Dir/*.mp4" | ForEach-Object {
-    $BaseName = $_.BaseName
-    $Output = Join-Path $OriMp3Dir "$BaseName.mp3"
-    if (!(Test-Path $Output)) {
-        Write-Host "正在轉換 $($_.Name) 為 MP3..." -ForegroundColor Cyan
-        ffmpeg -v error -i $_.FullName -vn -acodec libmp3lame -q:a 2 $Output
-    }
-}
-Write-Host "準備完成！請確認 file/ori_mp3/ 內有檔案。" -ForegroundColor Green
-```
+腳本存放於 `1_Prepare_And_Convert.ps1` 。
 
 ## 步驟 2：自動偵測靜音並切割音訊 (Phase 2)
 
@@ -128,16 +116,16 @@ Offset 資訊會存入 `file/tmp_csv/{ID}.csv`。
 
 ```powershell
 # 處理全部檔案
-.\pwsh\1_Split_Audio.ps1
+.\pwsh\2_Split_Audio.ps1
 
 # 處理指定檔案
-.\pwsh\1_Split_Audio.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\2_Split_Audio.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理指定檔案
-.\pwsh\1_Split_Audio.ps1 -TargetFileName "my_video.mp3" -Force
+.\pwsh\2_Split_Audio.ps1 -TargetFileName "my_video.mp3" -Force
 ```
 
-腳本存放於 `pwsh/1_Split_Audio.ps1`。
+腳本存放於 `pwsh/2_Split_Audio.ps1`。
 
 ```powershell
 # 設定區
@@ -227,25 +215,33 @@ Write-Host "`n切割完成！" -ForegroundColor Green
 - `-TargetFileName "檔案名.mp3"`：指定只處理單一檔案 (需為 `file/ori_mp3` 中的原始檔名)
 - `-Force`：強制重新處理 (忽略已存在的輸出檔案)
 - `-Model "medium"`：指定 Whisper 模型 (預設 medium)
+- `-Engine`：指定 Whisper 引擎 (`openai` 或 `ctranslate2`)
+- `-InitialPrompt`：提供給 AI 的提示詞 (Context)，有助於專有名詞辨識
+- `-UseVAD`：啟用 VAD 語音活動偵測 (僅限 `ctranslate2`)
 
 **範例**：
 
 ```powershell
-# 處理全部檔案
-.\pwsh\1.5_Run_whisper.ps1
+# 處理全部檔案 (預設使用 .env 設定，若 .env 不存在則預設 openai)
+.\pwsh\3_Run_whisper.ps1
+
+# 使用 CTranslate2 加速引擎
+.\pwsh\3_Run_whisper.ps1 -Engine ctranslate2
+
+# 啟用 VAD 過濾 (僅限 ctranslate2)
+.\pwsh\3_Run_whisper.ps1 -Engine ctranslate2 -UseVAD
+
+# 加入提示詞 (Context) 以提升準確度
+.\pwsh\3_Run_whisper.ps1 -InitialPrompt "這是一段關於量子力學的演講，包含許多物理專有名詞。"
 
 # 處理指定檔案
-.\pwsh\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\3_Run_whisper.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理指定檔案
-.\pwsh\1.5_Run_whisper.ps1 -TargetFileName "my_video.mp3" -Force
+.\pwsh\3_Run_whisper.ps1 -TargetFileName "my_video.mp3" -Force
 ```
 
-腳本存放於 `pwsh/1.5_Run_whisper.ps1`。
-
-```powershell
-# (腳本內容略，請直接執行檔案)
-```
+腳本存放於 `pwsh/3_Run_whisper.ps1`。
 
 ## 步驟 4：合併字幕並校正時間軸 (Phase 4)
 
@@ -261,16 +257,16 @@ Write-Host "`n切割完成！" -ForegroundColor Green
 
 ```powershell
 # 處理全部檔案
-.\pwsh\2_Merge_SRT.ps1
+.\pwsh\4_Merge_SRT.ps1
 
 # 處理指定檔案
-.\pwsh\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\4_Merge_SRT.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理指定檔案
-.\pwsh\2_Merge_SRT.ps1 -TargetFileName "my_video.mp3" -Force
+.\pwsh\4_Merge_SRT.ps1 -TargetFileName "my_video.mp3" -Force
 ```
 
-腳本存放於 `pwsh/2_Merge_SRT.ps1`。
+腳本存放於 `pwsh/4_Merge_SRT.ps1`。
 
 ```powershell
 # 設定區
@@ -359,7 +355,7 @@ Write-Host "所有作業結束！"
 **範例**：
 
 ```powershell
-.\pwsh\2.2_Convert_S2T.ps1
+.\pwsh\5_Convert_S2T.ps1
 ```
 
 ## 步驟 4.5：AI 優化辨識錯誤文字 (Phase 4.5)
@@ -400,13 +396,13 @@ file/fin_srt/
 
 ```powershell
 # 處理全部檔案
-.\pwsh\2.5_Fix_Error_Words.ps1
+.\pwsh\6_Fix_Error_Words.ps1
 
 # 處理指定檔案
-.\pwsh\2.5_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\6_Fix_Error_Words.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理
-.\pwsh\2.5_Fix_Error_Words.ps1 -Force
+.\pwsh\6_Fix_Error_Words.ps1 -Force
 ```
 
 ### 對照表 JSON 結構
@@ -446,16 +442,16 @@ file/fin_srt/
 
 ```powershell
 # 處理全部檔案
-.\pwsh\3_Extract_Text.ps1
+.\pwsh\7_Extract_Text.ps1
 
 # 處理指定檔案
-.\pwsh\3_Extract_Text.ps1 -TargetFileName "my_video.mp3"
+.\pwsh\7_Extract_Text.ps1 -TargetFileName "my_video.mp3"
 
 # 強制重新處理指定檔案
-.\pwsh\3_Extract_Text.ps1 -TargetFileName "my_video.srt" -Force
+.\pwsh\7_Extract_Text.ps1 -TargetFileName "my_video.srt" -Force
 ```
 
-腳本存放於 `pwsh/3_Extract_Text.ps1`。
+腳本存放於 `pwsh/7_Extract_Text.ps1`。
 
 ```powershell
 # (腳本內容略，請直接執行檔案)
@@ -487,10 +483,10 @@ file/fin_srt/
 ### SOP 總結
 
 1. **環境**：執行 `uv sync` (建立虛擬環境並安裝相依套件)。
-2. **準備**：執行 `.\pwsh\0_Prepare_And_Convert.ps1` (建立資料夾、MP4 轉 MP3)。
-3. **切割**：執行 `.\pwsh\1_Split_Audio.ps1` (產出 chunk mp3 和 csv)。
-4. **辨識**：執行 `.\pwsh\1.5_Run_whisper.ps1` (產出 chunk srt)。
-5. **合併**：執行 `.\pwsh\2_Merge_SRT.ps1` (產出 完整 srt)。
-6. **修正**：執行 `.\pwsh\2.5_Fix_Error_Words.ps1` (自動修正常見辨識錯誤)。
-7. **轉文**：執行 `.\pwsh\3_Extract_Text.ps1` (產出 完整 txt)。
+2. **準備**：執行 `.\pwsh\1_Prepare_And_Convert.ps1` (建立資料夾、MP4 轉 MP3)。
+3. **切割**：執行 `.\pwsh\2_Split_Audio.ps1` (產出 chunk mp3 和 csv)。
+4. **辨識**：執行 `.\pwsh\3_Run_whisper.ps1` (產出 chunk srt)。
+5. **合併**：執行 `.\pwsh\4_Merge_SRT.ps1` (產出 完整 srt)。
+6. **修正**：執行 `.\pwsh\6_Fix_Error_Words.ps1` (自動修正常見辨識錯誤)。
+7. **轉文**：執行 `.\pwsh\7_Extract_Text.ps1` (產出 完整 txt)。
 8. **清理**：執行 `.\pwsh\Clear_File_Dir.ps1` (清空暫存檔，保留 models/ 與 .gitkeep)。

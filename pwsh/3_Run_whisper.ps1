@@ -91,7 +91,7 @@ if ($TargetFileName) {
     $Mp3Files = Get-ChildItem "$TmpMp3Dir/${FileID}_chunk_*.mp3"
     
     if ($Mp3Files.Count -eq 0) {
-        Write-Warning "找不到對應的切割檔案 (ID: $FileID)。請確認是否已執行 1_Split_Audio.ps1"
+        Write-Warning "找不到對應的切割檔案 (ID: $FileID)。請確認是否已執行 2_Split_Audio.ps1"
         exit
     }
 } else {

@@ -1,4 +1,4 @@
-# 2.5_Fix_Error_Words.ps1
+# 6_Fix_Error_Words.ps1
 # AI 優化 SRT 字幕中的辨識錯誤文字
 # 此腳本為輔助工具，主要由 AI Agent 執行實際修正
 # 

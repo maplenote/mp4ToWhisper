@@ -172,7 +172,12 @@ foreach ($File in $Mp3Files) {
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  完成: $BaseName.srt" -ForegroundColor Green
     } else {
-        Write-Host "  失敗: $($File.Name)" -ForegroundColor Red
+        # 針對 ctranslate2 可能因警告而回傳非 0 代碼，增加檔案檢查機制
+        if (Test-Path $SrtPath) {
+            Write-Host "  完成 (ExitCode $LASTEXITCODE): $BaseName.srt" -ForegroundColor Green
+        } else {
+            Write-Host "  失敗 (ExitCode $LASTEXITCODE): $($File.Name)" -ForegroundColor Red
+        }
     }
 }
 

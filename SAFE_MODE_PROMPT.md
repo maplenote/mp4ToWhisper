@@ -31,6 +31,7 @@ Execute the following steps in order.
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/2_Split_Audio.ps1`
 4. **Transcribe (Whisper)**
    - **Action**: Use the Engine and Initial Prompt determined in Phase 0.
+   - **Note**: If specifying a target file via `-TargetFileName`, ensure you use the **.mp3** filename from `file/ori_mp3`, NOT the original .mp4 filename.
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/3_Run_whisper.ps1 -Engine <User_Engine> -InitialPrompt "<User_Context>"`
    - *Example*: `pwsh ... -File pwsh/3_Run_whisper.ps1 -Engine ctranslate2 -InitialPrompt "This is a lecture about Quantum Physics."`
 5. **Merge SRT**

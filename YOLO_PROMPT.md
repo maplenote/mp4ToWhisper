@@ -20,6 +20,7 @@ Execute the following steps in order. If a step fails, stop and report the error
      - **Engine**: Read `WHISPER_ENGINE` from `.env`. Default to `openai` if missing.
      - **Context**: **Automatically** read filenames from `file/ori_mp4` (or mp3). Construct a descriptive sentence (e.g., "This is a video about [Filename]") to use as the `-InitialPrompt`.
      - **Constraint**: Do **NOT** ask the user. Decide autonomously.
+   - **Note**: If specifying a target file via `-TargetFileName`, ensure you use the **.mp3** filename from `file/ori_mp3`, NOT the original .mp4 filename.
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/3_Run_whisper.ps1 -Engine <Auto_Engine> -InitialPrompt "<Auto_Context>"`
    - *Example*: `... -InitialPrompt "This is a video about Physics_Lecture_01"`
    - Goal: Transcribe chunks to SRT files in `file/tmp_srt` using `uv run whisper` or `whisper-ctranslate2`.

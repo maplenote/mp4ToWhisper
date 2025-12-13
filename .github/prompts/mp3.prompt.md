@@ -40,6 +40,7 @@ agent: agent
 
 - **引擎參數**：若選擇 `ctranslate2`，加上 `-Engine ctranslate2` (可選 `-UseVAD`)。
 - **提示詞參數**：若有 Context，加上 `-InitialPrompt "使用者提供的內容"`。
+- **注意**：`-TargetFileName` 必須指向 `file/ori_mp3` 下的 **.mp3** 檔案。
 
 ```powershell
 # 範例 (請依照實際選擇修改指令)

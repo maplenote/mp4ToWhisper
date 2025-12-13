@@ -15,6 +15,9 @@ $TmpSrtDir = Join-Path $BaseDir "file/tmp_srt"
 $ModelsDir = Join-Path $BaseDir "file/models"
 $EnvFile = Join-Path $BaseDir ".env"
 
+# 避免 Hugging Face Hub 在 Windows 上因無 Symlink 權限而發出警告
+$env:HF_HUB_DISABLE_SYMLINKS_WARNING = "1"
+
 # 讀取 .env 設定
 if (Test-Path $EnvFile) {
     Get-Content $EnvFile | ForEach-Object {

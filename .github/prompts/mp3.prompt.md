@@ -10,15 +10,19 @@ agent: agent
 
 將 `file/ori_mp3/` 下的指定 MP3 檔案，經過完整流程處理，最終產出 `file/fin_srt/` 下的 SRT 字幕檔。
 
-## 前置確認
+## 前置確認 (Phase 0)
 
-在開始執行步驟前，請先詢問使用者：
+**在執行任何指令之前**，請先詢問使用者以下設定，並記住使用者的選擇：
 
-1. **Whisper 引擎選擇**：目前預設使用 `openai`，是否需要切換為 `ctranslate2` (速度較快)？
-2. **提示詞 (Context)**：是否有關於音訊內容的描述 (例如主題、專有名詞)，可透過 `-InitialPrompt` 提升辨識準確度？
+1. **Whisper 引擎選擇**：
+   - 詢問使用者要使用 `openai` (預設) 還是 `ctranslate2` (速度較快)？
+   - 若使用者未指定，預設為 `openai`。
+2. **提示詞 (Context)**：
+   - 詢問使用者：「是否有關於音訊內容的描述 (例如主題、專有名詞)？」
+   - 若使用者提供，請將其作為 `-InitialPrompt` 的內容。
+   - 若使用者未提供，可詢問是否要使用檔名作為預設 Context。
 
-若使用者選擇 `ctranslate2`，請在執行步驟 2 時加上 `-Engine ctranslate2` 參數 (可搭配 `-UseVAD` 開啟語音活動偵測)。
-若使用者提供提示詞，請在執行步驟 2 時加上 `-InitialPrompt "提示詞內容"` 參數。
+**請將上述選擇記錄下來，並在「步驟 2：Whisper 辨識」時套用。**
 
 ## 執行步驟
 
@@ -32,15 +36,14 @@ agent: agent
 
 ### 步驟 2：Whisper 辨識
 
+請根據 **前置確認** 的結果組合指令：
+
+- **引擎參數**：若選擇 `ctranslate2`，加上 `-Engine ctranslate2` (可選 `-UseVAD`)。
+- **提示詞參數**：若有 Context，加上 `-InitialPrompt "使用者提供的內容"`。
+
 ```powershell
-# 基本指令 (預設 openai)
-.\pwsh\3_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3"
-
-# 若使用 ctranslate2 (範例)
-# .\pwsh\3_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3" -Engine ctranslate2 -UseVAD
-
-# 若有提示詞 (範例)
-# .\pwsh\3_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3" -InitialPrompt "這是一段訪談"
+# 範例 (請依照實際選擇修改指令)
+.\pwsh\3_Run_whisper.ps1 -TargetFileName "{{檔案名稱}}.mp3" -Engine <引擎> -InitialPrompt "<提示詞>"
 ```
 
 ### 步驟 3：合併字幕

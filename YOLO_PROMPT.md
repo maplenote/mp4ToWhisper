@@ -16,9 +16,12 @@ Execute the following steps in order. If a step fails, stop and report the error
    - Goal: Split MP3s into chunks in `file/tmp_mp3`.
 
 3. **Transcribe (Whisper)**
-   - **Pre-check**: Ask user for preferred engine (`openai` or `ctranslate2`) and any `InitialPrompt`.
-   - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/3_Run_whisper.ps1`
-   - *Optional Args*: `-Engine ctranslate2`, `-UseVAD`, `-InitialPrompt "context"`
+   - **Auto-Config**:
+     - **Engine**: Read `WHISPER_ENGINE` from `.env`. Default to `openai` if missing.
+     - **Context**: **Automatically** read filenames from `file/ori_mp4` (or mp3). Construct a descriptive sentence (e.g., "This is a video about [Filename]") to use as the `-InitialPrompt`.
+     - **Constraint**: Do **NOT** ask the user. Decide autonomously.
+   - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/3_Run_whisper.ps1 -Engine <Auto_Engine> -InitialPrompt "<Auto_Context>"`
+   - *Example*: `... -InitialPrompt "This is a video about Physics_Lecture_01"`
    - Goal: Transcribe chunks to SRT files in `file/tmp_srt` using `uv run whisper` or `whisper-ctranslate2`.
 
 4. **Merge SRT**

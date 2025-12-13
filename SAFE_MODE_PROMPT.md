@@ -15,19 +15,27 @@ You must adhere to the following **STRICT SECURITY PROTOCOLS**.
 Execute the following steps in order.
 > **Note**: Use `pwsh` for all PowerShell commands.
 
+### Phase 0: Initialization & Setup (Ask BEFORE Running)
+
+1. **Configuration Check**
+   - **Ask User**: "Which Whisper Engine do you want to use? (Default: `openai`)" (Check `.env` if available).
+   - **Ask User**: "What is the context or topic of the video(s)?"
+     - *Fallback*: If the user provides no extra info, **automatically** infer the topic from the filenames in `file/ori_mp4` or `file/ori_mp3`.
+   - **Store**: Remember these choices (Engine and Prompt) for Step 3.
+
 ### Phase 1: Audio Processing
 
-1. **Prepare & Convert**
+2. **Prepare & Convert**
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/1_Prepare_And_Convert.ps1`
-2. **Split Audio**
+3. **Split Audio**
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/2_Split_Audio.ps1`
-3. **Transcribe (Whisper)**
-   - **Pre-check**: Ask user if they want to use `openai` (default) or `ctranslate2` engine, and if they have an `InitialPrompt`.
-   - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/3_Run_whisper.ps1`
-   - *Optional Args*: `-Engine ctranslate2`, `-UseVAD`, `-InitialPrompt "context"`
-4. **Merge SRT**
+4. **Transcribe (Whisper)**
+   - **Action**: Use the Engine and Initial Prompt determined in Phase 0.
+   - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/3_Run_whisper.ps1 -Engine <User_Engine> -InitialPrompt "<User_Context>"`
+   - *Example*: `pwsh ... -File pwsh/3_Run_whisper.ps1 -Engine ctranslate2 -InitialPrompt "This is a lecture about Quantum Physics."`
+5. **Merge SRT**
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/4_Merge_SRT.ps1`
-5. **Convert S2T**
+6. **Convert S2T**
    - Command: `pwsh -ExecutionPolicy Bypass -File pwsh/5_Convert_S2T.ps1`
 
 ### Phase 2: AI Analysis (Scoped Write Access)

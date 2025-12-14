@@ -137,8 +137,8 @@ foreach ($File in $Mp3Files) {
             "--device", "cuda",
             "--output_dir", $TmpSrtDir, 
             "--output_format", "srt",
-            "--model_dir", $ModelsDir
-            # whisper-ctranslate2 可能不支援 --verbose False，故省略
+            "--model_dir", $ModelsDir,
+            "--verbose", "False"
         )
         
         if ($UseVAD) {
